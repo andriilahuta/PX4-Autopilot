@@ -104,7 +104,9 @@ struct MspOsdElement : MspOsdElementBase {
 class MspEncoder {
 public:
     MspEncoder(MspVersion version = MspVersion::V1);
-    msp_osd_buffer encode(const auto& object) const;
+    template<typename T>
+    std::enable_if_t<!std::is_base_of_v<OsdObject, T>, msp_osd_buffer>
+    encode(const T& object) const;
     msp_osd_buffer encode(const OsdElement& element) const;
     std::vector<msp_osd_buffer> encode(const OsdObject& object) const;
 private:
@@ -137,7 +139,9 @@ private:
 };
 
 
-msp_osd_buffer MspEncoder::encode(const auto& object) const {
+template<typename T>
+std::enable_if_t<!std::is_base_of_v<OsdObject, T>, msp_osd_buffer>
+MspEncoder::encode(const T& object) const {
     msp_osd_buffer headerBuff = createHeaderBuffer();
     const msp_osd_buffer dataBuff = createDataBuffer(object);
     MspProtocolCommand command = getProtocolCommand(object);
