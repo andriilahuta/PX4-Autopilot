@@ -35,18 +35,20 @@ protected:
     OsdObject(const OsdPosition& position);
 };
 
-class OsdTextObject : public OsdObject, public OsdElement {
+class OsdTextObject : public OsdObject {
 public:
     OsdTextObject(const OsdPosition& position, std::string value);
-    virtual ~OsdTextObject() = default;
-    OsdPosition position = {};  // consolidate OsdObject::position and OsdElement::position
+
+    std::string value = "";
+    OsdFontLevel fontLevel = OsdFontLevel::NORMAL;
+    bool blink = false;
+
     virtual std::vector<OsdElement> elements() const override;
 };
 
 class OsdTextPairObject : public OsdObject {
 public:
     OsdTextPairObject(const OsdPosition& position, std::string valueLeft, std::string valueRight);
-    virtual ~OsdTextPairObject() = default;
 
     std::string valueLeft = "";
     std::string valueRight = "";

@@ -19,7 +19,7 @@ namespace msp_osd_utils {
 
         if (pad) {
             for (int i = 0; i < sizeof(value) - bytes.size(); i++) {
-                bytes.push_back(std::byte {});
+                bytes.push_back(std::byte{});
             }
         }
 

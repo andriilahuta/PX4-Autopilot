@@ -1,7 +1,8 @@
 #include <cstddef>
-#include <span>
 #include <unistd.h>
 #include "msp.hpp"
+#include "compat/container.hpp"
+#include "compat/span.hpp"
 
 
 static std::byte mspSerialChecksumBuf(const auto& data, std::byte checksum = std::byte{0}) {
@@ -140,7 +141,7 @@ msp_osd_buffer MspEncoder::createDataBuffer(const MspStatus status) const {
 
 
 
-    return msp_osd_buffer {};
+    return msp_osd_buffer{};
 }
 
 msp_osd_buffer MspEncoder::createDataBuffer(const MspOsdSysElement& element) const {
@@ -204,10 +205,10 @@ msp_osd_buffer MspEncoder::encodeV1(msp_osd_buffer& headerBuff, const msp_osd_bu
     headerBuff.push_back(static_cast<std::byte>(command));
 
     if (dataSize >= MSP_JUMBO_FRAME_SIZE_LIMIT) {
-        headerBuff.append_range(msp_osd_utils::to_bytes(static_cast<uint16_t>(dataSize), true));
+        append_range(headerBuff, msp_osd_utils::to_bytes(static_cast<uint16_t>(dataSize), true));
     }
 
-    std::byte checksum = mspSerialChecksumBuf(std::span {headerBuff.begin() + 3, headerBuff.end()});
+    std::byte checksum = mspSerialChecksumBuf(std::span<std::byte>(headerBuff.begin() + 3, headerBuff.end()));
     checksum = mspSerialChecksumBuf(dataBuff, checksum);
 
     msp_osd_buffer res;
@@ -226,20 +227,20 @@ msp_osd_buffer MspEncoder::encodeV2overV1(msp_osd_buffer& headerBuff, const msp_
     headerBuff.push_back(static_cast<std::byte>(MspProtocolCommand::V2_FRAME_ID));
 
     msp_osd_buffer headerV2Buff {
-        std::byte {},  // flags byte
+        std::byte{},  // flags byte
     };
-    headerV2Buff.append_range(msp_osd_utils::to_bytes(static_cast<uint16_t>(command), true));
-    headerV2Buff.append_range(msp_osd_utils::to_bytes(static_cast<uint16_t>(dataBuff.size()), true));
-    headerBuff.append_range(headerV2Buff);
+    append_range(headerV2Buff, msp_osd_utils::to_bytes(static_cast<uint16_t>(command), true));
+    append_range(headerV2Buff, msp_osd_utils::to_bytes(static_cast<uint16_t>(dataBuff.size()), true));
+    append_range(headerBuff, headerV2Buff);
 
     if (payloadSize >= MSP_JUMBO_FRAME_SIZE_LIMIT) {
-        headerBuff.append_range(msp_osd_utils::to_bytes(static_cast<uint16_t>(payloadSize), true));
+        append_range(headerBuff, msp_osd_utils::to_bytes(static_cast<uint16_t>(payloadSize), true));
     }
 
     std::byte v2_checksum = crc8DvbS2Update(headerV2Buff);
     v2_checksum = crc8DvbS2Update(dataBuff, v2_checksum);
 
-    std::byte v1_checksum = mspSerialChecksumBuf(std::span {headerBuff.begin() + 3, headerBuff.end()});
+    std::byte v1_checksum = mspSerialChecksumBuf(std::span<std::byte>(headerBuff.begin() + 3, headerBuff.end()));
     v1_checksum = mspSerialChecksumBuf(dataBuff, v1_checksum);
     v1_checksum = mspSerialChecksumBuf(msp_osd_buffer {v2_checksum}, v1_checksum);
 
@@ -259,11 +260,11 @@ msp_osd_buffer MspEncoder::encodeV2(msp_osd_buffer& headerBuff, const msp_osd_bu
         uint16_t cmd;
         uint16_t size;
     */
-    headerBuff.push_back(std::byte {});  // flags byte
-    headerBuff.append_range(msp_osd_utils::to_bytes(static_cast<uint16_t>(command), true));
-    headerBuff.append_range(msp_osd_utils::to_bytes(static_cast<uint16_t>(dataBuff.size()), true));
+    headerBuff.push_back(std::byte{});  // flags byte
+    append_range(headerBuff, msp_osd_utils::to_bytes(static_cast<uint16_t>(command), true));
+    append_range(headerBuff, msp_osd_utils::to_bytes(static_cast<uint16_t>(dataBuff.size()), true));
 
-    std::byte checksum = crc8DvbS2Update(std::span {headerBuff.begin() + 3, headerBuff.end()});
+    std::byte checksum = crc8DvbS2Update(std::span<std::byte>(headerBuff.begin() + 3, headerBuff.end()));
     checksum = crc8DvbS2Update(dataBuff, checksum);
 
     msp_osd_buffer res;

@@ -7,8 +7,7 @@ OsdObject::OsdObject(const OsdPosition& position):
 
 
 OsdTextObject::OsdTextObject(const OsdPosition& position, std::string value):
-        position(position) {
-    this->value = value;
+        OsdObject(position), value(value) {
 }
 
 std::vector<OsdElement> OsdTextObject::elements() const {
@@ -24,9 +23,9 @@ std::vector<OsdElement> OsdTextObject::elements() const {
 
 
 OsdTextPairObject::OsdTextPairObject(const OsdPosition& position, std::string valueLeft, std::string valueRight):
+        OsdObject(position),
         valueLeft(valueLeft),
         valueRight(valueRight) {
-    this->position = position;
 }
 
 std::vector<OsdElement> OsdTextPairObject::elements() const {
