@@ -89,69 +89,38 @@ msp_osd_buffer MspEncoder::createDataBuffer(const MspCommand command) const {
 }
 
 msp_osd_buffer MspEncoder::createDataBuffer(const MspStatus status) const {
-    /*
-    MSP:
-        uint16_t cycleTime;
-        uint16_t i2cErrorsCount;
-        uint16_t sensor;
-        uint32_t flag;
-        uint8_t currentSetting;
-    */
+    msp_osd_buffer buff;
+    uint16_t sensors = 0;
+    uint32_t flightModeFlags = 0;
 
+    for (auto sensor: status.sensors) {
+        if (map_contains(mspSensorShiftMap, sensor)) {
+            sensors |= static_cast<int>(sensor) << mspSensorShiftMap.at(sensor);
+        };
+    }
+    for (auto flightMode: status.flightModes) {
+        flightModeFlags |= 1 << static_cast<int>(flightMode);
+    }
 
+    append_range(buff, msp_osd_utils::to_bytes(status.time, true));
+    append_range(buff, msp_osd_utils::to_bytes(status.errorsCount, true));
+    append_range(buff, msp_osd_utils::to_bytes(sensors, true));
+    append_range(buff, msp_osd_utils::to_bytes(flightModeFlags, true));
+    buff.push_back(static_cast<std::byte>(status.pidProfile));
+    append_range(buff, msp_osd_utils::to_bytes(status.averageSystemLoadPercent, true));
+    buff.push_back(static_cast<std::byte>(status.pidProfileCount));
+    buff.push_back(static_cast<std::byte>(status.controlRateProfile));
 
-            // boxBitmask_t flightModeFlags;
-            // const int flagBits = packFlightModeFlags(&flightModeFlags);
-
-            // sbufWriteU16(dst, getTaskDeltaTimeUs(TASK_PID));
-            // sbufWriteU16(dst, i2cGetErrorCounter());
-            // sbufWriteU16(dst, sensors(SENSOR_ACC) | sensors(SENSOR_BARO) << 1 | sensors(SENSOR_MAG) << 2 | sensors(SENSOR_GPS) << 3 | sensors(SENSOR_RANGEFINDER) << 4 | sensors(SENSOR_GYRO) << 5);
-            // sbufWriteData(dst, &flightModeFlags, 4);        // unconditional part of flags, first 32 bits
-            // sbufWriteU8(dst, getCurrentPidProfileIndex());
-            // sbufWriteU16(dst, constrain(getAverageSystemLoadPercent(), 0, LOAD_PERCENTAGE_ONE));
-            // if (cmdMSP == MSP_STATUS_EX) {
-            //     sbufWriteU8(dst, PID_PROFILE_COUNT);
-            //     sbufWriteU8(dst, getCurrentControlRateProfileIndex());
-            // } else {  // MSP_STATUS
-            //     sbufWriteU16(dst, 0); // gyro cycle time
-            // }
-
-            // // write flightModeFlags header. Lowest 4 bits contain number of bytes that follow
-            // // header is emited even when all bits fit into 32 bits to allow future extension
-            // int byteCount = (flagBits - 32 + 7) / 8;        // 32 already stored, round up
-            // byteCount = constrain(byteCount, 0, 15);        // limit to 16 bytes (128 bits)
-            // sbufWriteU8(dst, byteCount);
-            // sbufWriteData(dst, ((uint8_t*)&flightModeFlags) + 4, byteCount);
-
-            // // Write arming disable flags
-            // // 1 byte, flag count
-            // sbufWriteU8(dst, ARMING_DISABLE_FLAGS_COUNT);
-            // // 4 bytes, flags
-            // const uint32_t armingDisableFlags = getArmingDisableFlags();
-            // sbufWriteU32(dst, armingDisableFlags);
-
-            // // config state flags - bits to indicate the state of the configuration, reboot required, etc.
-            // // other flags can be added as needed
-            // sbufWriteU8(dst, (getRebootRequired() << 0));
-
-            // // Added in API version 1.46
-            // // Write CPU temp
-            // sbufWriteU16(dst, getCoreTemperatureCelsius());
-
-
-
-
-    return msp_osd_buffer{};
+    return buff;
 }
 
 msp_osd_buffer MspEncoder::createDataBuffer(const MspOsdSysElement& element) const {
-    msp_osd_buffer buff {
+    return msp_osd_buffer {
         static_cast<std::byte>(MspCommand::SYS),
         std::byte{element.row},
         std::byte{element.column},
         std::byte{static_cast<uint8_t>(element.type)},
     };
-    return buff;
 }
 
 msp_osd_buffer MspEncoder::createDataBuffer(const MspOsdElement& element) const {

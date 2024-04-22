@@ -1,7 +1,9 @@
 #pragma once
 
 #include <map>
+#include <set>
 #include <vector>
+#include "fc.hpp"
 #include "osd.hpp"
 #include "utils.hpp"
 
@@ -22,7 +24,7 @@ enum struct MspVersion: uint8_t {
 	V2_OVER_V1 = 1,
 	V2 = 2,
 };
-const std::map<MspVersion, char> mspVersionMagicInitializer{
+const std::map<MspVersion, char> mspVersionMagicInitializer {
     {MspVersion::V1, 'M'},
     {MspVersion::V2_OVER_V1, 'M'},
     {MspVersion::V2, 'X'},
@@ -78,7 +80,24 @@ enum struct MspOsdSystemElementType : uint8_t {
     FAN_SPEED = 10,
 };
 
+const std::map<FcSensorFlag, int> mspSensorShiftMap {
+    {FcSensorFlag::ACC, 0},
+    {FcSensorFlag::BARO, 1},
+    {FcSensorFlag::MAG, 2},
+    {FcSensorFlag::GPS, 3},
+    {FcSensorFlag::RANGEFINDER, 4},
+    {FcSensorFlag::GYRO, 5},
+};
+
 struct MspStatus {
+    uint16_t time = 0;  // microseconds
+    std::set<FlightModeFlag> flightModes{};
+    std::set<FcSensorFlag> sensors{FcSensorFlag::ACC, FcSensorFlag::BARO, FcSensorFlag::GYRO};
+    uint16_t averageSystemLoadPercent = 0;
+    uint16_t errorsCount = 0;
+    uint8_t pidProfileCount = 0;
+    uint8_t pidProfile = 0;
+    uint8_t controlRateProfile = 0;
 };
 
 struct MspOsdElementBase {
@@ -125,7 +144,7 @@ private:
     msp_osd_buffer createDataBuffer(const MspOsdSysElement& element) const;
     msp_osd_buffer createDataBuffer(const MspOsdElement& element) const;
     msp_osd_buffer createHeaderBuffer(const MspResultStatus resultStatus = MspResultStatus::ACK) const;
-    MspProtocolCommand getProtocolCommand(const auto& object) const;
+    template<typename T> MspProtocolCommand getProtocolCommand(const T& object) const;
 };
 
 
@@ -148,7 +167,8 @@ MspEncoder::encode(const T& object) const {
     return encodeDispatch(headerBuff, dataBuff, command);
 }
 
-MspProtocolCommand MspEncoder::getProtocolCommand(const auto& object) const {
-    if (std::is_same<decltype(object), MspStatus>::value) return MspProtocolCommand::STATUS;
+template<typename T>
+MspProtocolCommand MspEncoder::getProtocolCommand(const T& object) const {
+    if (std::is_same<T, MspStatus>::value) return MspProtocolCommand::STATUS;
     return MspProtocolCommand::DISPLAYPORT;
 }
