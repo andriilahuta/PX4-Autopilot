@@ -99,7 +99,7 @@ msp_osd_buffer MspEncoder::createDataBuffer(const MspStatus status) const {
         };
     }
     for (auto flightMode: status.flightModes) {
-        flightModeFlags |= 1 << static_cast<int>(flightMode);
+        flightModeFlags |= msp_osd_utils::bit(static_cast<int>(flightMode));
     }
 
     append_range(buff, msp_osd_utils::to_bytes(status.time, true));

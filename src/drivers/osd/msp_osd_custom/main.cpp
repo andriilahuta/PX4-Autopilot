@@ -7,8 +7,8 @@
 
 
 void printVal(const std::byte b) {
-    // std::cout << (char)b;
-    std::cout << std::hex << "0x" << static_cast<unsigned int>(b) << " " << std::dec;
+    std::cout << (char)b;
+    // std::cout << std::hex << "0x" << static_cast<unsigned int>(b) << " " << std::dec;
 }
 
 void printVal(const msp_osd_buffer& b) {
@@ -56,17 +56,21 @@ int main(int argc, char *argv[]) {
     auto write = [&](auto v) {return writeSerial(writer, encoder, v);};
     // auto write = [&](auto v) {return printObj(encoder, v);};
 
-    OsdTextObject disarmed(OsdPosition {.x = 2, .y = 12}, "DISARMED");
-    OsdTextObject armed(OsdPosition {.x = 8, .y = 6}, "ARMED");
+    OsdText disarmed(OsdPosition {.x = 2, .y = 12}, "DISARMED");
+    OsdText armed(OsdPosition {.x = 8, .y = 6}, "ARMED");
+    OsdBattery batt(OsdPosition {.x = 8, .y = 3}, 11.1, 22.2);
+    OsdHorizon ah(OsdPosition {.x = 8, .y = 5}, 69, 60);
+    OsdCompass cp(OsdPosition {.x = 8, .y = 4}, 900);
 
 
     write(MspCommand::CLEAR_SCREEN);
     write(MspCommand::DRAW_SCREEN);
 
-    // printObj(encoder, disarmed);
     auto res = write(disarmed);
     std::cout << "Res: " << res << std::endl;
-    // printObj(encoder, disarmed);
+    write(batt);
+    write(ah);
+    write(cp);
     write(MspCommand::DRAW_SCREEN);
 
     // arm
