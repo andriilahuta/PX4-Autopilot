@@ -31,4 +31,7 @@ namespace msp_osd_utils {
 
         return bytes;
     }
+
+
+    int decidegrees_to_degrees(int angle);
 }
