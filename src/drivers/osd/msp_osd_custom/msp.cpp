@@ -249,11 +249,13 @@ MspWriter::MspWriter(int fd):
 }
 
 bool MspWriter::write(const msp_osd_buffer& buffer) const {
+    if (buffer.empty()) return false;
 	int packetSize = buffer.size();
 	return ::write(_fd, reinterpret_cast<const char*>(buffer.data()), packetSize) == packetSize;
 }
 
 bool MspWriter::write(const std::vector<msp_osd_buffer>& buffers) const {
+    if (buffers.empty()) return false;
     bool res = true;
     for (const auto& buffer : buffers) {
         res &= write(buffer);

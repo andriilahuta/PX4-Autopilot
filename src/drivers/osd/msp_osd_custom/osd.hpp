@@ -168,20 +168,27 @@ class OsdObject {
 public:
     virtual ~OsdObject() = default;
     OsdPosition position = {};
+    bool enabled = true;
+
     virtual std::vector<OsdElement> elements() const = 0;
+    void setBlink(bool value);
+    bool shouldBlink() const;
 protected:
     OsdObject() = default;
     OsdObject(const OsdPosition& position);
+    bool shouldNativeBlink() const;
+private:
+    bool blink = false;
 };
 
 class OsdText : public OsdObject {
 public:
     OsdText(const OsdPosition& position, std::string value = "");
     virtual std::vector<OsdElement> elements() const override;
+    void setValue(std::string value);
 protected:
     std::string value = "";
     OsdFontLevel fontLevel = OsdFontLevel::NORMAL;
-    bool blink = false;
 };
 
 class OsdBattery : public OsdText {
@@ -227,4 +234,19 @@ private:
     };
 
     int getDiscreteDirection(int heading, int directions);
+};
+
+
+class OsdBlinker {
+public:
+    static OsdBlinker& getInstance();
+    OsdBlinker(OsdBlinker const&) = delete;
+    void operator=(OsdBlinker const&) = delete;
+
+    bool showObject(const OsdObject& object) const;
+
+    bool enabled = false;
+    float frequency = 1;
+private:
+    OsdBlinker() {};
 };
