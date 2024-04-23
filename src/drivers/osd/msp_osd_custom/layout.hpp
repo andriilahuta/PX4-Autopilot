@@ -1,0 +1,76 @@
+#pragma once
+
+#include <map>
+#include <memory>
+#include "osd.hpp"
+#include "msp.hpp"
+#include "utils.hpp"
+
+
+enum struct OsdLayoutElement {
+    COMPASS,
+    HORIZON,
+    BATTERY_INFO,
+    ARMING_STATUS,
+    FLIGHT_MODE,
+};
+
+struct OsdLayoutConfig {
+    std::vector<std::pair<OsdLayoutElement, OsdPosition>> elements;
+};
+
+struct OsdBatteryParams {
+    float voltage = 0;
+    float current = 0;
+};
+
+struct OsdAttitudeParams {
+    int roll = 0;
+    int pitch = 0;
+    int yaw = 0;
+};
+
+struct OsdParams {
+    bool armed = false;
+    std::string flightMode = "";
+    OsdBatteryParams battery;
+    OsdAttitudeParams attitude;
+};
+
+
+class OsdLayout {
+public:
+    virtual ~OsdLayout() = default;
+    void tick(const OsdParams& params);
+    virtual const std::vector<std::shared_ptr<OsdObject>> getObjects() const = 0;
+protected:
+    virtual void updateObjects(const OsdParams& params) = 0;
+
+    msp_osd_utils::SyncTimer timer;
+    OsdParams prevParams;
+};
+
+class OsdPrimaryLayout : public OsdLayout {
+public:
+    OsdPrimaryLayout(const OsdLayoutConfig& config);
+    virtual const std::vector<std::shared_ptr<OsdObject>> getObjects() const override;
+protected:
+    virtual void updateObjects(const OsdParams& params) override;
+private:
+    OsdLayoutConfig config;
+    std::map<OsdLayoutElement, std::shared_ptr<OsdObject>> objects;
+};
+
+
+class OsdLayoutPainter {
+public:
+    OsdLayoutPainter(const MspEncoder& encoder, const MspWriter& writer);
+    OsdLayoutPainter(const MspEncoder&&, const MspWriter&&) = delete;
+    void draw(const OsdLayout& layout);
+private:
+    const MspEncoder& encoder;
+    const MspWriter& writer;
+
+    bool drawObject(const OsdObject& object);
+    bool write(const auto& object);
+};

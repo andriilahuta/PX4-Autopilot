@@ -3,35 +3,9 @@
 #include <termios.h>
 #include <typeinfo>
 #include <unistd.h>
+#include "layout.hpp"
 #include "msp.hpp"
 #include "compat/format.hpp"
-
-
-void printVal(const std::byte b) {
-    std::cout << (char)b;
-    // std::cout << std::hex << "0x" << static_cast<unsigned int>(b) << " " << std::dec;
-}
-
-void printVal(const msp_osd_buffer& b) {
-    for (auto n : b)
-        printVal(n);
-}
-
-
-bool printObj(const MspEncoder& encoder, const auto& obj) {
-    auto res = encoder.encode(obj);
-    for (auto el : res)
-        printVal(el);
-
-    std::cout << std::endl;
-    return true;
-}
-
-
-bool writeSerial(const MspWriter& writer, const MspEncoder& encoder, const auto& obj) {
-    auto res = encoder.encode(obj);
-    return writer.write(res);
-}
 
 
 int main(int argc, char *argv[]) {
@@ -54,63 +28,46 @@ int main(int argc, char *argv[]) {
     MspWriter writer(_msp_fd);
     MspEncoder encoder(MspVersion::V1);
 
-    auto write = [&](auto v) {return writeSerial(writer, encoder, v);};
-    // auto write = [&](auto v) {return printObj(encoder, v);};
+    auto& blinker = OsdBlinker::getInstance();
+    blinker.enabled = true;
 
-    OsdText disarmed(OsdPosition {.x = 2, .y = 12}, "DISARMED");
-    OsdText armed(OsdPosition {.x = 8, .y = 6}, "ARMED");
-    OsdBattery batt(OsdPosition {.x = 8, .y = 3}, 11.1, 22.2);
-    OsdHorizon ah(OsdPosition {.x = 8, .y = 5}, 69, 60);
-    OsdCompass cp(OsdPosition {.x = 8, .y = 4}, 900);
-
-
-    write(MspCommand::CLEAR_SCREEN);
-    // write(MspCommand::DRAW_SCREEN);
-
-    auto res = write(disarmed);
-    std::cout << "Res: " << res << std::endl;
-    write(batt);
-    write(ah);
-    write(cp);
-    write(MspCommand::DRAW_SCREEN);
-
-    // arm
-    for (int i = 0; i < 10; i++)
-        write(MspStatus {
-            .time = 300,
-            .flightModes = {FlightModeFlag::ARM, FlightModeFlag::_3D}
-        });
-    // writer.write(
-    //     std::vector<std::byte> {
-            // std::byte{0x24}, std::byte{0x4d}, std::byte{0x3e}, std::byte{0x16}, std::byte{0x65},
-            // std::byte{0x7c}, std::byte{0x00}, std::byte{0x00}, std::byte{0x00}, std::byte{0x23}, std::byte{0x00},
-    //     std::byte{0x01},
-    //     std::byte{0x00}, std::byte{0x00}, std::byte{0x00}, std::byte{0x00}, std::byte{0x13}, std::byte{0x00}, std::byte{0x00}, std::byte{0x00}, std::byte{0x00}, std::byte{0x1a}, std::byte{0x00}, std::byte{0x00}, std::byte{0x00}, std::byte{0x00}, std::byte{0x00}, std::byte{0x24}
-    //     });
-
-    // sleep(15);
-
-    res = write(armed);
-    std::cout << "Res2: " << res << std::endl;
-
-    write(MspCommand::DRAW_SCREEN);
-
-
-    auto& inst = OsdBlinker::getInstance();
-    inst.enabled = true;
-    OsdText test(OsdPosition {.x = 3, .y = 10}, "TEST_0");
-    test.setBlink(true);
-
-    for (int i = 0; i < 50; i++) {
-        test.setValue(std::format("TEST_{}", i));
-        if (i > 30) test.setBlink(false);
-
-        write(MspCommand::CLEAR_SCREEN);
-        if (test.enabled && inst.showObject(test)) {
-            write(test);
-            // test.position.x++;
+    OsdLayoutPainter painter(encoder, writer);
+    OsdPrimaryLayout layout(OsdLayoutConfig {
+        .elements = {
+            {OsdLayoutElement::COMPASS, {1, 2}},
+            {OsdLayoutElement::HORIZON, {10, 10}},
+            {OsdLayoutElement::BATTERY_INFO, {5, 6}},
+            {OsdLayoutElement::ARMING_STATUS, {7, 8}},
         }
-        write(MspCommand::DRAW_SCREEN);
+    });
+
+    std::set<FlightModeFlag> flightModes{FlightModeFlag::_3D};
+    OsdParams params {
+        .armed = false,
+        .flightMode = "FLIGHT",
+        .battery = OsdBatteryParams{0, 0},
+        .attitude = OsdAttitudeParams{0, 0, 0},
+    };
+
+    for (int i = 0; i < 60; i++) {
+        params.battery.voltage = i * 10;
+        params.battery.current = i * 100;
+        params.attitude.pitch = i;
+        params.attitude.roll = i * 3;
+        params.attitude.yaw = i * 5 * 10;
+        if (i > 30) {
+            params.armed = true;
+            flightModes.insert(FlightModeFlag::ARM);
+        }
+
+        writeMsp(encoder, writer, MspStatus {
+            .time = i * 1000,
+            .flightModes = flightModes
+        });
+
+        layout.tick(params);
+        painter.draw(layout);
+
         sleep(1);
     }
 

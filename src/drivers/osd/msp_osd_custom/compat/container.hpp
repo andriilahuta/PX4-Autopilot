@@ -20,3 +20,20 @@ bool map_contains(const std::map<K, V>& map, const K& key) {
     return map.find(key) != map.end();
 #endif
 }
+
+#ifdef __cpp_lib_ranges
+    #include <ranges>
+#else
+    namespace std {
+        namespace views {
+            template<typename K, typename V>
+            auto values(const std::map<K, V>& map) {
+                std::vector<V> res;
+                for (const auto& [_, val] : map) {
+                    res.push_back(val);
+                }
+                return res;
+            }
+        }
+    }
+#endif
