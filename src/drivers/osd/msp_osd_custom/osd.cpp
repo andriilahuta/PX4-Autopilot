@@ -5,10 +5,6 @@
 #include "compat/format.hpp"
 
 
-OsdObject::OsdObject(const OsdPosition& position):
-    position(position) {
-}
-
 void OsdObject::setBlink(bool value) {
     blink = value;
 }
@@ -24,15 +20,19 @@ bool OsdObject::shouldNativeBlink() const {
 
 
 
-OsdText::OsdText(const OsdPosition& position, std::string value):
-        OsdObject(position), value(value) {
+OsdText::OsdText(std::string value):
+        value(value) {
 }
 
 void OsdText::setValue(std::string value) {
     this->value = value;
 }
 
-std::vector<OsdElement> OsdText::elements() const {
+void OsdText::setFontLevel(OsdFontLevel fontLevel) {
+    this->fontLevel = fontLevel;
+}
+
+const std::vector<OsdElement> OsdText::elements() const {
     return std::vector<OsdElement> {
         OsdElement {
             .position = position,
@@ -44,12 +44,11 @@ std::vector<OsdElement> OsdText::elements() const {
 }
 
 
-OsdBattery::OsdBattery(const OsdPosition& position, float voltage, float current):
-        OsdText(position) {
-    updateStats(voltage, current);
+OsdBattery::OsdBattery(float voltage, float current) {
+    update(voltage, current);
 }
 
-void OsdBattery::updateStats(float voltage, float current) {
+void OsdBattery::update(float voltage, float current) {
     const bool isCritical = true;
     value = std::format(
         "{:c} {}{:c} {}{:c}",
@@ -65,8 +64,7 @@ void OsdBattery::updateStats(float voltage, float current) {
 }
 
 
-OsdHorizon::OsdHorizon(const OsdPosition& position, int roll, int pitch):
-        OsdObject(position) {
+OsdHorizon::OsdHorizon(int roll, int pitch) {
     update(roll, pitch);
 }
 
@@ -89,7 +87,7 @@ void OsdHorizon::update(int roll, int pitch) {
     this->pitch = pitch;
 }
 
-std::vector<OsdElement> OsdHorizon::elements() const {
+const std::vector<OsdElement> OsdHorizon::elements() const {
     std::vector<OsdElement> res;
 
     for (int x = -4; x <= 4; x++) {
@@ -112,8 +110,7 @@ std::vector<OsdElement> OsdHorizon::elements() const {
 }
 
 
-OsdCompass::OsdCompass(const OsdPosition& position, int yaw):
-        OsdText(position) {
+OsdCompass::OsdCompass(int yaw) {
     update(yaw);
 }
 

@@ -170,7 +170,7 @@ public:
     OsdPosition position = {};
     bool enabled = true;
 
-    virtual std::vector<OsdElement> elements() const = 0;
+    virtual const std::vector<OsdElement> elements() const = 0;
     void setBlink(bool value);
     bool shouldBlink() const;
 protected:
@@ -183,9 +183,10 @@ private:
 
 class OsdText : public OsdObject {
 public:
-    OsdText(const OsdPosition& position, std::string value = "");
-    virtual std::vector<OsdElement> elements() const override;
+    OsdText(std::string value = "");
+    virtual const std::vector<OsdElement> elements() const override;
     void setValue(std::string value);
+    void setFontLevel(OsdFontLevel fontLevel);
 protected:
     std::string value = "";
     OsdFontLevel fontLevel = OsdFontLevel::NORMAL;
@@ -193,15 +194,15 @@ protected:
 
 class OsdBattery : public OsdText {
 public:
-    OsdBattery(const OsdPosition& position, float voltage, float current);
-    void updateStats(float voltage, float current);
+    OsdBattery(float voltage = 0, float current = 0);
+    void update(float voltage, float current);
 };
 
 class OsdHorizon : public OsdObject {
 public:
-    OsdHorizon(const OsdPosition& position, int roll, int pitch);
+    OsdHorizon(int roll = 0, int pitch = 0);
 
-    virtual std::vector<OsdElement> elements() const override;
+    virtual const std::vector<OsdElement> elements() const override;
     void update(int roll, int pitch);
 private:
     const int symbolCount = 9;
@@ -214,7 +215,7 @@ private:
 
 class OsdCompass : public OsdText {
 public:
-    OsdCompass(const OsdPosition& position, int yaw);
+    OsdCompass(int yaw = 0);
     void update(int yaw);
 private:
     #define COMPASS_SYM(sym) static_cast<unsigned char>(OsdSymbol::sym)

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+#include <functional>
 #include <vector>
 
 
@@ -34,4 +36,15 @@ namespace msp_osd_utils {
 
 
     int decidegrees_to_degrees(int angle);
+
+
+    class SyncTimer {
+    public:
+        SyncTimer();
+        void schedule(std::function<void()> callback, int delay);
+        void tick();
+    private:
+        std::vector<std::pair<std::function<void()>, std::chrono::milliseconds>> callbacks;
+        std::chrono::milliseconds currentTime;
+    };
 }

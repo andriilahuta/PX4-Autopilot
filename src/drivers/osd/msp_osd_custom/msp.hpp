@@ -158,6 +158,12 @@ private:
 };
 
 
+bool writeMsp(const MspEncoder& encoder, const MspWriter& writer, const auto& object) {
+    auto res = encoder.encode(object);
+    return writer.write(res);
+}
+
+
 template<typename T>
 std::enable_if_t<!std::is_base_of_v<OsdObject, T>, msp_osd_buffer>
 MspEncoder::encode(const T& object) const {
