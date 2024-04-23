@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <chrono>
 #include "osd.hpp"
 #include "utils.hpp"
 #include "compat/format.hpp"
@@ -8,9 +9,27 @@ OsdObject::OsdObject(const OsdPosition& position):
     position(position) {
 }
 
+void OsdObject::setBlink(bool value) {
+    blink = value;
+}
+
+bool OsdObject::shouldBlink() const {
+    return blink;
+}
+
+bool OsdObject::shouldNativeBlink() const {
+    if (OsdBlinker::getInstance().enabled) return false;
+    return shouldBlink();
+}
+
+
 
 OsdText::OsdText(const OsdPosition& position, std::string value):
         OsdObject(position), value(value) {
+}
+
+void OsdText::setValue(std::string value) {
+    this->value = value;
 }
 
 std::vector<OsdElement> OsdText::elements() const {
@@ -19,7 +38,7 @@ std::vector<OsdElement> OsdText::elements() const {
             .position = position,
             .value = value,
             .fontLevel = fontLevel,
-            .blink = blink,
+            .blink = shouldNativeBlink(),
         }
     };
 }
@@ -40,7 +59,7 @@ void OsdBattery::updateStats(float voltage, float current) {
     );
 
     if (isCritical) {
-        blink = true;
+        setBlink(true);
         fontLevel = OsdFontLevel::CRITICAL;
     }
 }
@@ -83,6 +102,7 @@ std::vector<OsdElement> OsdHorizon::elements() const {
                         position.y + y / symbolCount,
                     },
                     .value = std::string{static_cast<int>(OsdSymbol::AH_BAR9_0) + y % symbolCount},
+                    .blink = shouldNativeBlink(),
                 }
             );
         }
@@ -115,4 +135,21 @@ int OsdCompass::getDiscreteDirection(int heading, int directions) {
     direction %= directions;  // normalize
 
     return direction;  // return segment number
+}
+
+
+OsdBlinker& OsdBlinker::getInstance() {
+    static OsdBlinker instance;
+    return instance;
+}
+
+bool OsdBlinker::showObject(const OsdObject& object) const {
+    if (!enabled) return true;
+    if (!object.shouldBlink()) return true;
+
+    const auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch());
+    const int period = static_cast<int>(1000.0 / frequency);
+
+    return now.count() % (period * 2) < period;
 }

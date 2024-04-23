@@ -4,6 +4,7 @@
 #include <typeinfo>
 #include <unistd.h>
 #include "msp.hpp"
+#include "compat/format.hpp"
 
 
 void printVal(const std::byte b) {
@@ -64,7 +65,7 @@ int main(int argc, char *argv[]) {
 
 
     write(MspCommand::CLEAR_SCREEN);
-    write(MspCommand::DRAW_SCREEN);
+    // write(MspCommand::DRAW_SCREEN);
 
     auto res = write(disarmed);
     std::cout << "Res: " << res << std::endl;
@@ -93,6 +94,25 @@ int main(int argc, char *argv[]) {
     std::cout << "Res2: " << res << std::endl;
 
     write(MspCommand::DRAW_SCREEN);
+
+
+    auto& inst = OsdBlinker::getInstance();
+    inst.enabled = true;
+    OsdText test(OsdPosition {.x = 3, .y = 10}, "TEST_0");
+    test.setBlink(true);
+
+    for (int i = 0; i < 50; i++) {
+        test.setValue(std::format("TEST_{}", i));
+        if (i > 30) test.setBlink(false);
+
+        write(MspCommand::CLEAR_SCREEN);
+        if (test.enabled && inst.showObject(test)) {
+            write(test);
+            // test.position.x++;
+        }
+        write(MspCommand::DRAW_SCREEN);
+        sleep(1);
+    }
 
     return 0;
 }
