@@ -10,7 +10,7 @@ void OsdLayout::tick(const OsdParams& params) {
 }
 
 
-OsdPrimaryLayout::OsdPrimaryLayout(const OsdLayoutConfig& config):
+OsdPrimaryLayout::OsdPrimaryLayout(const OsdPrimaryLayoutConfig& config):
         config(config), objects {
             {OsdLayoutElement::COMPASS, std::make_shared<OsdCompass>()},
             {OsdLayoutElement::HORIZON, std::make_shared<OsdHorizon>()},
@@ -21,9 +21,10 @@ OsdPrimaryLayout::OsdPrimaryLayout(const OsdLayoutConfig& config):
     for (const auto [_, obj] : objects) {
         obj->enabled = false;
     }
-    for (const auto& [element, position] : config.elements) {
+    for (const auto& [element, position, config] : config.elements) {
         if (map_contains(objects, element)) {
             auto obj = objects[element];
+            obj->configure(config);
             obj->enabled = true;
             obj->position = position;
         };
@@ -36,11 +37,11 @@ const std::vector<std::shared_ptr<OsdObject>> OsdPrimaryLayout::getObjects() con
 }
 
 void OsdPrimaryLayout::updateObjects(const OsdParams& params) {
-    auto compass = std::static_pointer_cast<OsdCompass>(objects[OsdLayoutElement::COMPASS]);
-    auto horizon = std::static_pointer_cast<OsdHorizon>(objects[OsdLayoutElement::HORIZON]);
-    auto batteryInfo = std::static_pointer_cast<OsdBattery>(objects[OsdLayoutElement::BATTERY_INFO]);
-    auto armingStatus = std::static_pointer_cast<OsdText>(objects[OsdLayoutElement::ARMING_STATUS]);
-    auto flightMode = std::static_pointer_cast<OsdText>(objects[OsdLayoutElement::FLIGHT_MODE]);
+    auto compass = std::dynamic_pointer_cast<OsdCompass>(objects[OsdLayoutElement::COMPASS]);
+    auto horizon = std::dynamic_pointer_cast<OsdHorizon>(objects[OsdLayoutElement::HORIZON]);
+    auto batteryInfo = std::dynamic_pointer_cast<OsdBattery>(objects[OsdLayoutElement::BATTERY_INFO]);
+    auto armingStatus = std::dynamic_pointer_cast<OsdText>(objects[OsdLayoutElement::ARMING_STATUS]);
+    auto flightMode = std::dynamic_pointer_cast<OsdText>(objects[OsdLayoutElement::FLIGHT_MODE]);
 
     compass->update(params.attitude.yaw);
     horizon->update(params.attitude.roll, params.attitude.pitch);

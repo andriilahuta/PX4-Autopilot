@@ -35,12 +35,12 @@ int main(int argc, char *argv[]) {
     blinker.enabled = true;
 
     OsdLayoutPainter painter(encoder, writer);
-    OsdPrimaryLayout layout(OsdLayoutConfig {
+    OsdPrimaryLayout layout(OsdPrimaryLayoutConfig {
         .elements = {
-            {OsdLayoutElement::COMPASS, {1, 2}},
-            {OsdLayoutElement::HORIZON, {10, 10}},
-            {OsdLayoutElement::BATTERY_INFO, {5, 6}},
-            {OsdLayoutElement::ARMING_STATUS, {7, 8}},
+            {OsdLayoutElement::COMPASS, {1, 2}, nullptr},
+            {OsdLayoutElement::HORIZON, {10, 10}, nullptr},
+            {OsdLayoutElement::BATTERY_INFO, {5, 6}, std::make_shared<OsdBatteryConfig>(false)},
+            {OsdLayoutElement::ARMING_STATUS, {7, 8}, nullptr},
         }
     });
 
