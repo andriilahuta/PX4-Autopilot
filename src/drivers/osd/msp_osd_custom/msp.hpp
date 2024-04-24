@@ -4,7 +4,7 @@
 #include <set>
 #include <vector>
 #include "fc.hpp"
-#include "osd.hpp"
+#include "osd/elements/base.hpp"
 #include "utils.hpp"
 
 

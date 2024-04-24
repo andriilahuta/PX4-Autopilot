@@ -2,9 +2,9 @@
 
 #include <map>
 #include <memory>
-#include "osd.hpp"
-#include "msp.hpp"
-#include "utils.hpp"
+#include "../msp.hpp"
+#include "../utils.hpp"
+#include "elements/objects.hpp"
 
 
 enum struct OsdLayoutElement {

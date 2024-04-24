@@ -1,5 +1,6 @@
 #include "layout.hpp"
-#include "compat/container.hpp"
+#include "../compat/container.hpp"
+#include "utils.hpp"
 
 
 void OsdLayout::tick(const OsdParams& params) {
