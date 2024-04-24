@@ -35,11 +35,16 @@ OsdBattery::OsdBattery() {
 void OsdBattery::update(float voltage, float current) {
     const bool isCritical = true;
     value = std::format(
-        "{:c} {}{:c} {}{:c}",
+        "{:c} {}{:c}",
         static_cast<unsigned char>(OsdSymbol::BATT_3),
-        voltage, static_cast<unsigned char>(OsdSymbol::VOLT),
-        current, static_cast<unsigned char>(OsdSymbol::AMP)
+        voltage, static_cast<unsigned char>(OsdSymbol::VOLT)
     );
+    if (config->showAmps) {
+        value += std::format(
+            " {}{:c}",
+            current, static_cast<unsigned char>(OsdSymbol::AMP)
+        );
+    }
 
     if (isCritical) {
         setBlink(true);

@@ -15,8 +15,8 @@ enum struct OsdLayoutElement {
     FLIGHT_MODE,
 };
 
-struct OsdLayoutConfig {
-    std::vector<std::pair<OsdLayoutElement, OsdPosition>> elements;
+struct OsdPrimaryLayoutConfig {
+    std::vector<std::tuple<OsdLayoutElement, OsdPosition, std::shared_ptr<OsdObjectConfig>>> elements;
 };
 
 struct OsdBatteryParams {
@@ -52,12 +52,12 @@ protected:
 
 class OsdPrimaryLayout : public OsdLayout {
 public:
-    OsdPrimaryLayout(const OsdLayoutConfig& config);
+    OsdPrimaryLayout(const OsdPrimaryLayoutConfig& config);
     virtual const std::vector<std::shared_ptr<OsdObject>> getObjects() const override;
 protected:
     virtual void updateObjects(const OsdParams& params) override;
 private:
-    OsdLayoutConfig config;
+    OsdPrimaryLayoutConfig config;
     std::map<OsdLayoutElement, std::shared_ptr<OsdObject>> objects;
 };
 

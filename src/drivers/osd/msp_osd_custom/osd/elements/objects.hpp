@@ -2,9 +2,10 @@
 
 #include "../symbols.hpp"
 #include "base.hpp"
+#include "configs.hpp"
 
 
-class OsdText : public OsdObject {
+class OsdText : virtual public OsdObject {
 public:
     OsdText(std::string value = "");
     virtual const std::vector<OsdElement> elements() const override;
@@ -15,7 +16,7 @@ protected:
     OsdFontLevel fontLevel = OsdFontLevel::NORMAL;
 };
 
-class OsdBattery : public OsdText {
+class OsdBattery : public OsdText, public OsdObjectConfigMixin<OsdBatteryConfig> {
 public:
     OsdBattery();
     void update(float voltage, float current);

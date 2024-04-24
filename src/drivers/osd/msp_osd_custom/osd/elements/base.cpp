@@ -2,6 +2,14 @@
 #include "base.hpp"
 
 
+bool OsdObject::configure(const std::shared_ptr<OsdObjectConfig> config) {
+    if (config) {
+        this->config = config;
+        return true;
+    }
+    return false;
+}
+
 void OsdObject::setBlink(bool value) {
     blink = value;
 }
