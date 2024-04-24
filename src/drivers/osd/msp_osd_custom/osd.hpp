@@ -194,13 +194,13 @@ protected:
 
 class OsdBattery : public OsdText {
 public:
-    OsdBattery(float voltage = 0, float current = 0);
+    OsdBattery();
     void update(float voltage, float current);
 };
 
 class OsdHorizon : public OsdObject {
 public:
-    OsdHorizon(int roll = 0, int pitch = 0);
+    OsdHorizon();
 
     virtual const std::vector<OsdElement> elements() const override;
     void update(int roll, int pitch);
@@ -215,7 +215,7 @@ private:
 
 class OsdCompass : public OsdText {
 public:
-    OsdCompass(int yaw = 0);
+    OsdCompass();
     void update(int yaw);
 private:
     #define COMPASS_SYM(sym) static_cast<unsigned char>(OsdSymbol::sym)

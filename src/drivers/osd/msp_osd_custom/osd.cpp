@@ -44,8 +44,8 @@ const std::vector<OsdElement> OsdText::elements() const {
 }
 
 
-OsdBattery::OsdBattery(float voltage, float current) {
-    update(voltage, current);
+OsdBattery::OsdBattery() {
+    update(0, 0);
 }
 
 void OsdBattery::update(float voltage, float current) {
@@ -64,8 +64,8 @@ void OsdBattery::update(float voltage, float current) {
 }
 
 
-OsdHorizon::OsdHorizon(int roll, int pitch) {
-    update(roll, pitch);
+OsdHorizon::OsdHorizon() {
+    update(0, 0);
 }
 
 void OsdHorizon::update(int roll, int pitch) {
@@ -110,8 +110,8 @@ const std::vector<OsdElement> OsdHorizon::elements() const {
 }
 
 
-OsdCompass::OsdCompass(int yaw) {
-    update(yaw);
+OsdCompass::OsdCompass() {
+    update(0);
 }
 
 void OsdCompass::update(int yaw) {
