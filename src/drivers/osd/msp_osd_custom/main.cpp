@@ -5,8 +5,9 @@
 #include <termios.h>
 #include <typeinfo>
 #include <unistd.h>
-#include "layout.hpp"
 #include "msp.hpp"
+#include "osd/layout.hpp"
+#include "osd/utils.hpp"
 #include "compat/format.hpp"
 
 
