@@ -1,4 +1,6 @@
 #include <fcntl.h>
+#include <chrono>
+#include <thread>
 #include <iostream>
 #include <termios.h>
 #include <typeinfo>
@@ -49,27 +51,36 @@ int main(int argc, char *argv[]) {
         .attitude = OsdAttitudeParams{0, 0, 0},
     };
 
-    for (int i = 0; i < 60; i++) {
+    for (int i = 0; i < 60 * 2; i++) {
         params.battery.voltage = i * 10;
         params.battery.current = i * 100;
         params.attitude.pitch = i;
-        params.attitude.roll = i * 3;
-        params.attitude.yaw = i * 5 * 10;
-        if (i > 30) {
+        params.attitude.roll = i * 2;
+        params.attitude.yaw = i * 4 * 10;
+
+        if (i == 30) {
             params.armed = true;
             flightModes.insert(FlightModeFlag::ARM);
         }
+        if (i == 60) {
+            params.armed = false;
+            flightModes = {FlightModeFlag::_3D};
+        }
 
-        writeMsp(encoder, writer, MspStatus {
-            .time = i * 1000,
-            .flightModes = flightModes
-        });
+        for (int j = 0; j < 10; j++) {
+            writeMsp(encoder, writer, MspStatus {
+                .time = i * 1000,
+                .flightModes = flightModes
+            });
+        }
 
         layout.tick(params);
         painter.draw(layout);
 
-        sleep(1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
+    writeMsp(encoder, writer, MspCommand::CLEAR_SCREEN);
+    writeMsp(encoder, writer, MspCommand::DRAW_SCREEN);
 
     return 0;
 }

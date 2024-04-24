@@ -53,7 +53,10 @@ void OsdPrimaryLayout::updateObjects(const OsdParams& params) {
         timer.schedule([&]() {
             armingStatus->setFontLevel(OsdFontLevel::NORMAL);
             armingStatus->setBlink(false);
+            armingStatus->enabled = false;
         }, 5000);
+    } else if (!params.armed && prevParams.armed) {
+        armingStatus->enabled = true;
     }
 }
 
