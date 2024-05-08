@@ -14,6 +14,7 @@ OsdPrimaryLayout::OsdPrimaryLayout(const OsdPrimaryLayoutConfig& config):
         config(config), objects {
             {OsdLayoutElement::COMPASS, std::make_shared<OsdCompass>()},
             {OsdLayoutElement::HORIZON, std::make_shared<OsdHorizon>()},
+            {OsdLayoutElement::CROSSHAIRS, std::make_shared<OsdCrosshairs>()},
             {OsdLayoutElement::BATTERY_INFO, std::make_shared<OsdBattery>()},
             {OsdLayoutElement::ARMING_STATUS, std::make_shared<OsdText>()},
             {OsdLayoutElement::FLIGHT_MODE, std::make_shared<OsdText>()},
