@@ -66,7 +66,7 @@ void OsdHorizon::update(int roll, int pitch) {
     pitch = std::clamp(pitch * sign, -maxPitch, maxPitch);
 
     // Convert pitch to y compensation value
-    // (maxPitch / 25) divisor matches previous settings of fixed divisor of 8 and fixed max AHI pitch angle of 20.0 degrees
+    // uses fixed divisor of 8 and fixed max AHI pitch angle of 20.0 degrees
     if (maxPitch > 0) {
         pitch = pitch * 25 / maxPitch;
     }
@@ -86,7 +86,7 @@ const std::vector<OsdElement> OsdHorizon::elements() const {
                 OsdElement {
                     .position = OsdPosition{
                         position.x + x,
-                        position.y + y / symbolCount,
+                        position.y + y / symbolCount - symbolCount / 2,
                     },
                     .value = std::string{static_cast<int>(OsdSymbol::AH_BAR9_0) + y % symbolCount},
                     .blink = shouldNativeBlink(),
@@ -95,7 +95,46 @@ const std::vector<OsdElement> OsdHorizon::elements() const {
         }
     }
 
+    if (config->showSidebars) {
+        for (int y = -sidebarHeight; y <= sidebarHeight; y++) {
+            for (int xSign : {-1, 1}) {
+                res.push_back(
+                    OsdElement {
+                        .position = OsdPosition{
+                            position.x + xSign * sidebarWidth,
+                            position.y + y,
+                        },
+                        .value = std::string{static_cast<unsigned char>(OsdSymbol::AH_DECORATION)},
+                        .blink = shouldNativeBlink(),
+                    }
+                );
+            }
+        }
+        for (const auto& [xSign, symbol] : {std::pair(-1, OsdSymbol::AH_LEFT), std::pair(1, OsdSymbol::AH_RIGHT)}) {
+            res.push_back(
+                OsdElement {
+                    .position = OsdPosition{
+                        position.x + xSign * sidebarWidth - xSign,
+                        position.y,
+                    },
+                    .value = std::string{static_cast<unsigned char>(symbol)},
+                    .blink = shouldNativeBlink(),
+                }
+            );
+        }
+    }
+
     return res;
+}
+
+
+OsdCrosshairs::OsdCrosshairs() {
+    value = std::format(
+        "{:c}{:c}{:c}",
+        static_cast<unsigned char>(OsdSymbol::AH_CENTER_LINE),
+        static_cast<unsigned char>(OsdSymbol::AH_CENTER),
+        static_cast<unsigned char>(OsdSymbol::AH_CENTER_LINE_RIGHT)
+    );
 }
 
 

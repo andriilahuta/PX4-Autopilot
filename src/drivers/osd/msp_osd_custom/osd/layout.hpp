@@ -10,6 +10,7 @@
 enum struct OsdLayoutElement {
     COMPASS,
     HORIZON,
+    CROSSHAIRS,
     BATTERY_INFO,
     ARMING_STATUS,
     FLIGHT_MODE,

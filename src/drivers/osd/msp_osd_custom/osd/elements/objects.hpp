@@ -22,7 +22,7 @@ public:
     void update(float voltage, float current);
 };
 
-class OsdHorizon : public OsdObject {
+class OsdHorizon : public OsdObjectConfigMixin<OsdHorizonConfig> {
 public:
     OsdHorizon();
 
@@ -30,11 +30,18 @@ public:
     void update(int roll, int pitch);
 private:
     const int symbolCount = 9;
+    const int sidebarWidth = 7;
+    const int sidebarHeight = 3;
     bool inverted = false;
     int roll = 0;
     int pitch = 0;
     int maxRoll = 40;  // degrees
     int maxPitch = 20;  // degrees
+};
+
+class OsdCrosshairs : public OsdText {
+public:
+    OsdCrosshairs();
 };
 
 class OsdCompass : public OsdText {

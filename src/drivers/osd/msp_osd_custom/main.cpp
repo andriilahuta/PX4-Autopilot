@@ -38,7 +38,8 @@ int main(int argc, char *argv[]) {
     OsdPrimaryLayout layout(OsdPrimaryLayoutConfig {
         .elements = {
             {OsdLayoutElement::COMPASS, {1, 2}, nullptr},
-            {OsdLayoutElement::HORIZON, {10, 10}, nullptr},
+            {OsdLayoutElement::HORIZON, {10, 10}, std::make_shared<OsdHorizonConfig>(true)},
+            {OsdLayoutElement::CROSSHAIRS, {12, 12}, nullptr},
             {OsdLayoutElement::BATTERY_INFO, {5, 6}, std::make_shared<OsdBatteryConfig>(false)},
             {OsdLayoutElement::ARMING_STATUS, {7, 8}, nullptr},
         }
@@ -55,8 +56,8 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < 60 * 2; i++) {
         params.battery.voltage = i * 10;
         params.battery.current = i * 100;
-        params.attitude.pitch = i;
-        params.attitude.roll = i * 2;
+        params.attitude.pitch = -250 + i * 5;
+        params.attitude.roll = -450 + i * 7;
         params.attitude.yaw = i * 4 * 10;
 
         if (i == 30) {
