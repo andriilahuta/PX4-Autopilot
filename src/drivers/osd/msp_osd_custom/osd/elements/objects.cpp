@@ -57,7 +57,7 @@ OsdHorizon::OsdHorizon() {
     update(0, 0);
 }
 
-void OsdHorizon::update(int roll, int pitch) {
+void OsdHorizon::update(int pitch, int roll) {
     const int sign = inverted ? -1 : 1;
     const int maxPitch = this->maxPitch * 10;
     const int maxRoll = this->maxRoll * 10;

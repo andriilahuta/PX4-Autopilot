@@ -26,8 +26,8 @@ struct OsdBatteryParams {
 };
 
 struct OsdAttitudeParams {
-    int roll = 0;
     int pitch = 0;
+    int roll = 0;
     int yaw = 0;
 };
 

@@ -27,16 +27,17 @@ public:
     OsdHorizon();
 
     virtual const std::vector<OsdElement> elements() const override;
-    void update(int roll, int pitch);
+    void update(int pitch, int roll);
 private:
     const int symbolCount = 9;
     const int sidebarWidth = 7;
     const int sidebarHeight = 3;
+    
     bool inverted = false;
-    int roll = 0;
     int pitch = 0;
-    int maxRoll = 40;  // degrees
+    int roll = 0;
     int maxPitch = 20;  // degrees
+    int maxRoll = 40;  // degrees
 };
 
 class OsdCrosshairs : public OsdText {

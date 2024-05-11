@@ -5,10 +5,10 @@
 #include <termios.h>
 #include <typeinfo>
 #include <unistd.h>
-#include "msp.hpp"
-#include "osd/layout.hpp"
-#include "osd/utils.hpp"
-#include "compat/format.hpp"
+#include "../msp.hpp"
+#include "../osd/layout.hpp"
+#include "../osd/utils.hpp"
+#include "../compat/format.hpp"
 
 
 int main(int argc, char *argv[]) {
@@ -37,11 +37,12 @@ int main(int argc, char *argv[]) {
     OsdLayoutPainter painter(encoder, writer);
     OsdPrimaryLayout layout(OsdPrimaryLayoutConfig {
         .elements = {
-            {OsdLayoutElement::COMPASS, {1, 2}, nullptr},
-            {OsdLayoutElement::HORIZON, {10, 10}, std::make_shared<OsdHorizonConfig>(true)},
-            {OsdLayoutElement::CROSSHAIRS, {12, 12}, nullptr},
-            {OsdLayoutElement::BATTERY_INFO, {5, 6}, std::make_shared<OsdBatteryConfig>(false)},
-            {OsdLayoutElement::ARMING_STATUS, {7, 8}, nullptr},
+            {OsdLayoutElement::COMPASS, {12, 0}, nullptr},
+            {OsdLayoutElement::HORIZON, {23, 8}, std::make_shared<OsdHorizonConfig>(true)},
+            {OsdLayoutElement::CROSSHAIRS, {20, 8}, nullptr},
+            {OsdLayoutElement::BATTERY_INFO, {0, 0}, std::make_shared<OsdBatteryConfig>(false)},
+            {OsdLayoutElement::ARMING_STATUS, {14, 15}, nullptr},
+            {OsdLayoutElement::FLIGHT_MODE, {15, 16}, nullptr},
         }
     });
 

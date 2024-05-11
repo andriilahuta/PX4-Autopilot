@@ -45,7 +45,7 @@ void OsdPrimaryLayout::updateObjects(const OsdParams& params) {
     auto flightMode = std::dynamic_pointer_cast<OsdText>(objects[OsdLayoutElement::FLIGHT_MODE]);
 
     compass->update(params.attitude.yaw);
-    horizon->update(params.attitude.roll, params.attitude.pitch);
+    horizon->update(params.attitude.pitch, params.attitude.roll);
     batteryInfo->update(params.battery.voltage, params.battery.current);
     flightMode->setValue(params.flightMode);
 
