@@ -1,0 +1,12 @@
+menuconfig DRIVERS_OSD_MSP_OSD_CUSTOM
+	bool "msp_osd_custom"
+	default n
+	---help---
+		Enable support for msp_osd_custom
+
+menuconfig USER_MSP_OSD_CUSTOM
+	bool "msp_osd_custom running as userspace module"
+	default y
+	depends on BOARD_PROTECTED && DRIVERS_OSD_MSP_OSD_CUSTOM
+	---help---
+		Put msp_osd_custom in userspace memory
