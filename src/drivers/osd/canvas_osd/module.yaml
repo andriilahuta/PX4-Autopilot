@@ -2,7 +2,7 @@ module_name: CANVAS OSD
 serial_config:
     - command: canvas_osd start -d ${SERIAL_DEV}
       port_config_param:
-        name: CANVAS_OSD_CONFIG
+        name: CANVAS_OSD_CFG
         group: OSD
 
 parameters:
