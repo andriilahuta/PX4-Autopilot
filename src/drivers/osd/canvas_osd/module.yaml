@@ -1,8 +1,8 @@
-module_name: MSP OSD CUSTOM
+module_name: CANVAS OSD
 serial_config:
-    - command: msp_osd_custom start -d ${SERIAL_DEV}
+    - command: canvas_osd start -d ${SERIAL_DEV}
       port_config_param:
-        name: MSP_OSD_CUSTOM_CONFIG
+        name: CANVAS_OSD_CONFIG
         group: OSD
 
 parameters:

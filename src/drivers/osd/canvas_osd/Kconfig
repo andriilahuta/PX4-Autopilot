@@ -1,0 +1,12 @@
+menuconfig DRIVERS_OSD_CANVAS_OSD
+	bool "canvas_osd"
+	default n
+	---help---
+		Enable support for canvas_osd
+
+menuconfig USER_CANVAS_OSD
+	bool "canvas_osd running as userspace module"
+	default y
+	depends on BOARD_PROTECTED && DRIVERS_OSD_CANVAS_OSD
+	---help---
+		Put canvas_osd in userspace memory
