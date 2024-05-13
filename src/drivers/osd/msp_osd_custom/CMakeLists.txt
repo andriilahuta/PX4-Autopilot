@@ -34,8 +34,8 @@
 # add_subdirectory(MessageDisplay)
 
 px4_add_module(
-	MODULE drivers__osd__msp_osd_cudtom
-	MAIN msp_osd_cudtom
+	MODULE drivers__osd__msp_osd_custom
+	MAIN msp_osd_custom
 	SRCS
 		msp_osd.cpp
 		MspV1.cpp
