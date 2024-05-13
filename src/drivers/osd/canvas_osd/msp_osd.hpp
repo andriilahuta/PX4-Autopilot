@@ -56,7 +56,7 @@
 #include <uORB/topics/vehicle_status.h>
 
 #include "MspV1.hpp"
-#include "MessageDisplay/MessageDisplay.hpp"
+// #include "MessageDisplay/MessageDisplay.hpp"
 #include "uorb_to_msp.hpp"
 #include "msp.hpp"
 #include "osd/layout.hpp"
@@ -152,7 +152,7 @@ private:
 
 	int _msp_fd{-1};
 
-	msp_osd::MessageDisplay _display{};
+	// msp_osd::MessageDisplay _display{};
 
 	bool _is_initialized{false};
 

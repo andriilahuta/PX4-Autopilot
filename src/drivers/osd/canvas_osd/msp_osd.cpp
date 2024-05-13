@@ -122,8 +122,8 @@ MspOsd::MspOsd(const char *device) :
 	ModuleParams(nullptr),
 	ScheduledWorkItem(MODULE_NAME, px4::wq_configurations::lp_default)
 {
-	_display.set_period(_param_osd_scroll_rate.get() * 1000ULL);
-	_display.set_dwell(_param_osd_dwell_time.get() * 1000ULL);
+	// _display.set_period(_param_osd_scroll_rate.get() * 1000ULL);
+	// _display.set_dwell(_param_osd_dwell_time.get() * 1000ULL);
 
 	// back up device name for connection later
 	strcpy(_device, device);
@@ -443,8 +443,8 @@ void MspOsd::Run()
 void MspOsd::parameters_update()
 {
 	// update our display rate and dwell time
-	_display.set_period(hrt_abstime(_param_osd_scroll_rate.get() * 1000ULL));
-	_display.set_dwell(hrt_abstime(_param_osd_dwell_time.get() * 1000ULL));
+	// _display.set_period(hrt_abstime(_param_osd_scroll_rate.get() * 1000ULL));
+	// _display.set_dwell(hrt_abstime(_param_osd_dwell_time.get() * 1000ULL));
 }
 
 bool MspOsd::enabled(const SymbolIndex &symbol)
@@ -510,15 +510,15 @@ int MspOsd::print_status()
 {
 	PX4_INFO("Running on %s", _device);
 	PX4_INFO("\tinitialized: %d", _is_initialized);
-	PX4_INFO("\tinitialization issues: %d", _performance_data.initialization_problems);
-	PX4_INFO("\tscroll rate: %d", static_cast<int>(_param_osd_scroll_rate.get()));
-	PX4_INFO("\tsuccessful sends: %lu", _performance_data.successful_sends);
-	PX4_INFO("\tunsuccessful sends: %lu", _performance_data.unsuccessful_sends);
+	// PX4_INFO("\tinitialization issues: %d", _performance_data.initialization_problems);
+	// PX4_INFO("\tscroll rate: %d", static_cast<int>(_param_osd_scroll_rate.get()));
+	// PX4_INFO("\tsuccessful sends: %lu", _performance_data.successful_sends);
+	// PX4_INFO("\tunsuccessful sends: %lu", _performance_data.unsuccessful_sends);
 
 	// print current display string
-	char msg[FULL_MSG_BUFFER];
-	_display.get(msg, hrt_absolute_time());
-	PX4_INFO("Current message: \n\t%s", msg);
+	// char msg[FULL_MSG_BUFFER];
+	// _display.get(msg, hrt_absolute_time());
+	// PX4_INFO("Current message: \n\t%s", msg);
 
 	return 0;
 }
