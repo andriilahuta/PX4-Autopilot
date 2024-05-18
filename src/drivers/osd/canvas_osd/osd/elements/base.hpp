@@ -33,7 +33,7 @@ public:
     OsdPosition position = {};
     bool enabled = true;
 
-    virtual bool configure(const std::shared_ptr<OsdObjectConfig> config);
+    virtual bool configure(const std::shared_ptr<OsdObjectConfig>& config);
     virtual const std::vector<OsdElement> elements() const = 0;
     void setBlink(bool value);
     bool shouldBlink() const;
@@ -49,7 +49,7 @@ template<class _Config = OsdObjectConfig>
 class OsdObjectConfigMixin : virtual public OsdObject {
 static_assert(std::is_base_of_v<OsdObjectConfig, _Config>, "Config must inherit from OsdObjectConfig");
 public:
-    virtual bool configure(const std::shared_ptr<OsdObjectConfig> config) {
+    virtual bool configure(const std::shared_ptr<OsdObjectConfig>& config) {
         if (!config) return false;
 
         auto localConfig = std::dynamic_pointer_cast<_Config>(config);

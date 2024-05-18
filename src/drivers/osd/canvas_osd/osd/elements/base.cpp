@@ -2,7 +2,7 @@
 #include "base.hpp"
 
 
-bool OsdObject::configure(const std::shared_ptr<OsdObjectConfig> config) {
+bool OsdObject::configure(const std::shared_ptr<OsdObjectConfig>& config) {
     if (config) {
         this->config = config;
         return true;
