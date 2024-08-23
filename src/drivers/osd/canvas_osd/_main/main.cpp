@@ -5,10 +5,10 @@
 #include <termios.h>
 #include <typeinfo>
 #include <unistd.h>
-#include "../msp.hpp"
-#include "../osd/layout.hpp"
-#include "../osd/utils.hpp"
-#include "../compat/format.hpp"
+#include "../lib/msp.hpp"
+#include "../lib/osd/layout.hpp"
+#include "../lib/osd/utils.hpp"
+#include "../lib/compat/format.hpp"
 
 
 int main(int argc, char *argv[]) {

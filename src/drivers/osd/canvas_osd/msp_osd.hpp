@@ -58,8 +58,8 @@
 #include "MspV1.hpp"
 // #include "MessageDisplay/MessageDisplay.hpp"
 #include "uorb_to_msp.hpp"
-#include "msp.hpp"
-#include "osd/layout.hpp"
+#include "lib/msp.hpp"
+#include "lib/osd/layout.hpp"
 
 using namespace time_literals;
 
