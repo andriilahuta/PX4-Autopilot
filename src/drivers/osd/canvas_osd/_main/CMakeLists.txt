@@ -1,10 +1,11 @@
-cmake_minimum_required(VERSION 3.13)  # CMake version check
-project(simple_example)               # Create project "simple_example"
-set(CMAKE_CXX_STANDARD 17)            # Enable c++14 standard
+cmake_minimum_required(VERSION 3.13)
+project(simple_example)
+set(CMAKE_CXX_STANDARD 17)
 
-# Add main.cpp file of the project root directory as a source file
-set(SOURCE_FILES main.cpp ../lib/msp.cpp ../lib/utils.cpp ../lib/osd/layout.cpp ../lib/osd/utils.cpp ../lib/osd/elements/base.cpp ../lib/osd/elements/objects.cpp)
+add_subdirectory(osdlib)
 
-# Add executable target with source files listed in SOURCE_FILES variable
-add_executable(example ${SOURCE_FILES})
-target_compile_options(example PUBLIC -std=c++17 -Wno-narrowing)
+add_executable(main main.cpp)
+set_target_properties(main PROPERTIES COMPILE_FLAGS "-nostdinc++")
+target_link_libraries(main PRIVATE stdosdlib)
+target_link_options(main PRIVATE -nostdlib)
+# target_link_options(main PRIVATE -static-libgcc -static-libstdc++)

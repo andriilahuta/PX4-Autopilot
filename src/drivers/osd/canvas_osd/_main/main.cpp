@@ -1,22 +1,26 @@
 #include <fcntl.h>
-#include <chrono>
-#include <thread>
-#include <iostream>
+// #include <chrono>
+// #include <thread>
+// #include <iostream>
 #include <termios.h>
-#include <typeinfo>
+// #include <typeinfo>
 #include <unistd.h>
-#include "../lib/msp.hpp"
-#include "../lib/osd/layout.hpp"
-#include "../lib/osd/utils.hpp"
-#include "../lib/compat/format.hpp"
+// #include "../osdlib/msp.hpp"
+// #include "../osdlib/osd/layout.hpp"
+// #include "../osdlib/osd/utils.hpp"
+// #include "../osdlib/compat/format.hpp"
+#include "../osdlib/lib.hpp"
 
 
 int main(int argc, char *argv[]) {
+    Osd osd(0);
+    osd.print();
+
     auto _device = argv[1];
-    std::cout << "Device: " << _device << std::endl;
+    // std::cout << "Device: " << _device << std::endl;
     auto _msp_fd = open(_device, O_RDWR | O_NONBLOCK);
     if (_msp_fd < 0) {
-        std::cout << "Cant open " << _device << std::endl;
+        // std::cout << "Cant open " << _device << std::endl;
         return 1;
     }
     struct termios t;
@@ -28,62 +32,64 @@ int main(int argc, char *argv[]) {
     t.c_oflag = 0;
     tcsetattr(_msp_fd, TCSANOW, &t);
 
-    MspWriter writer(_msp_fd);
-    MspEncoder encoder(MspVersion::V1);
+    // Osd osd(_msp_fd);
 
-    auto& blinker = OsdBlinker::getInstance();
-    blinker.enabled = true;
+    // MspWriter writer(_msp_fd);
+    // MspEncoder encoder(MspVersion::V1);
 
-    OsdLayoutPainter painter(encoder, writer);
-    OsdPrimaryLayout layout(OsdPrimaryLayoutConfig {
-        .elements = {
-            {OsdLayoutElement::COMPASS, {12, 0}, nullptr},
-            {OsdLayoutElement::HORIZON, {23, 8}, std::make_shared<OsdHorizonConfig>(true)},
-            {OsdLayoutElement::CROSSHAIRS, {20, 8}, nullptr},
-            {OsdLayoutElement::BATTERY_INFO, {0, 0}, std::make_shared<OsdBatteryConfig>(false)},
-            {OsdLayoutElement::ARMING_STATUS, {14, 15}, nullptr},
-            {OsdLayoutElement::FLIGHT_MODE, {15, 16}, nullptr},
-        }
-    });
+    // auto& blinker = OsdBlinker::getInstance();
+    // blinker.enabled = true;
 
-    std::set<FlightModeFlag> flightModes{FlightModeFlag::_3D};
-    OsdParams params {
-        .armed = false,
-        .flightMode = "FLIGHT",
-        .battery = OsdBatteryParams{0, 0},
-        .attitude = OsdAttitudeParams{0, 0, 0},
-    };
+    // OsdLayoutPainter painter(encoder, writer);
+    // OsdPrimaryLayout layout(OsdPrimaryLayoutConfig {
+    //     .elements = {
+    //         {OsdLayoutElement::COMPASS, {12, 0}, nullptr},
+    //         {OsdLayoutElement::HORIZON, {23, 8}, std::make_shared<OsdHorizonConfig>(true)},
+    //         {OsdLayoutElement::CROSSHAIRS, {20, 8}, nullptr},
+    //         {OsdLayoutElement::BATTERY_INFO, {0, 0}, std::make_shared<OsdBatteryConfig>(false)},
+    //         {OsdLayoutElement::ARMING_STATUS, {14, 15}, nullptr},
+    //         {OsdLayoutElement::FLIGHT_MODE, {15, 16}, nullptr},
+    //     }
+    // });
+
+    // std::set<FlightModeFlag> flightModes{FlightModeFlag::_3D};
+    // OsdParams params {
+    //     .armed = false,
+    //     .flightMode = "FLIGHT",
+    //     .battery = OsdBatteryParams{0, 0},
+    //     .attitude = OsdAttitudeParams{0, 0, 0},
+    // };
 
     for (int i = 0; i < 60 * 2; i++) {
-        params.battery.voltage = i * 10;
-        params.battery.current = i * 100;
-        params.attitude.pitch = -250 + i * 5;
-        params.attitude.roll = -450 + i * 7;
-        params.attitude.yaw = i * 4 * 10;
+        // params.battery.voltage = i * 10;
+        // params.battery.current = i * 100;
+        // params.attitude.pitch = -250 + i * 5;
+        // params.attitude.roll = -450 + i * 7;
+        // params.attitude.yaw = i * 4 * 10;
 
-        if (i == 30) {
-            params.armed = true;
-            flightModes.insert(FlightModeFlag::ARM);
-        }
-        if (i == 60) {
-            params.armed = false;
-            flightModes = {FlightModeFlag::_3D};
-        }
+        // if (i == 30) {
+        //     params.armed = true;
+        //     flightModes.insert(FlightModeFlag::ARM);
+        // }
+        // if (i == 60) {
+        //     params.armed = false;
+        //     flightModes = {FlightModeFlag::_3D};
+        // }
 
-        for (int j = 0; j < 10; j++) {
-            writeMsp(encoder, writer, MspStatus {
-                .time = i * 1000,
-                .flightModes = flightModes
-            });
-        }
+        // for (int j = 0; j < 10; j++) {
+        //     writeMsp(encoder, writer, MspStatus {
+        //         .time = i * 1000,
+        //         .flightModes = flightModes
+        //     });
+        // }
 
-        layout.tick(params);
-        painter.draw(layout);
+        // layout.tick(params);
+        // painter.draw(layout);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        // std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
-    writeMsp(encoder, writer, MspCommand::CLEAR_SCREEN);
-    writeMsp(encoder, writer, MspCommand::DRAW_SCREEN);
+    // writeMsp(encoder, writer, MspCommand::CLEAR_SCREEN);
+    // writeMsp(encoder, writer, MspCommand::DRAW_SCREEN);
 
     return 0;
 }

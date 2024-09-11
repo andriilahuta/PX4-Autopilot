@@ -58,8 +58,7 @@
 #include "MspV1.hpp"
 // #include "MessageDisplay/MessageDisplay.hpp"
 #include "uorb_to_msp.hpp"
-#include "lib/msp.hpp"
-#include "lib/osd/layout.hpp"
+#include "osdlib/lib.hpp"
 
 using namespace time_literals;
 
@@ -137,18 +136,8 @@ private:
 	bool enabled(const SymbolIndex &symbol);
 
 	MspV1 _msp{0};
-	MspWriter writer(0);
-	MspEncoder encoder;
-	OsdLayoutPainter painter(encoder, writer);
-	OsdPrimaryLayout layout(OsdPrimaryLayoutConfig {
-		.elements = {
-		{OsdLayoutElement::COMPASS, {12, 0}, nullptr},
-		{OsdLayoutElement::HORIZON, {23, 8}, std::make_shared<OsdHorizonConfig>(true)},
-		{OsdLayoutElement::CROSSHAIRS, {20, 8}, nullptr},
-		{OsdLayoutElement::BATTERY_INFO, {0, 0}, std::make_shared<OsdBatteryConfig>(false)},
-		{OsdLayoutElement::ARMING_STATUS, {14, 15}, nullptr},
-		}
-	});
+
+	Osd osd{0};
 
 	int _msp_fd{-1};
 

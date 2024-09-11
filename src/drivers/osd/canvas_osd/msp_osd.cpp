@@ -64,8 +64,6 @@
 #include <lib/geo/geo.h>
 
 #include "MspV1.hpp"
-#include "osd/utils.hpp"
-#include "compat/format.hpp"
 
 #include <math.h>
 #include <matrix/math.hpp>
@@ -234,8 +232,6 @@ bool MspOsd::init()
 
 void MspOsd::Run()
 {
-	auto& blinker = OsdBlinker::getInstance();
-
 	if (should_exit()) {
 		ScheduleClear();
 		exit_and_cleanup();
@@ -270,9 +266,8 @@ void MspOsd::Run()
 		tcsetattr(_msp_fd, TCSANOW, &t);
 
 		// _msp = MspV1(_msp_fd);
-		writer = MspWriter(_msp_fd);
-		painter = OsdLayoutPainter(encoder, writer);
-		blinker.enabled = true;
+		osd = Osd(_msp_fd);
+		osd.setBlinkerEnabled(true);
 
 		_is_initialized = true;
 	}
@@ -287,8 +282,8 @@ void MspOsd::Run()
 		vehicle_status_s vehicle_status{};
 		_vehicle_status_sub.copy(&vehicle_status);
 
-		vehicle_attitude_s vehicle_attitude{};
-		_vehicle_attitude_sub.copy(&vehicle_attitude);
+		// vehicle_attitude_s vehicle_attitude{};
+		// _vehicle_attitude_sub.copy(&vehicle_attitude);
 
 		log_message_s log_message{};
 		_log_message_sub.copy(&log_message);
@@ -414,20 +409,35 @@ void MspOsd::Run()
 	const auto pitch = math::degrees(euler_attitude.theta());
 	const auto roll = math::degrees(euler_attitude.phi());
 
-	std::set<FlightModeFlag> flightModes{FlightModeFlag::_3D};
-	OsdParams params {
-		.armed = vehicle_status.arming_state == vehicle_status_s::ARMING_STATE_ARMED,
-		.flightMode = mode_util::nav_state_names[vehicle_status.nav_state],
-		.battery = OsdBatteryParams{battery_status.voltage_v * 10, battery_status.current_a * 100},
-		.attitude = OsdAttitudeParams{pitch, roll, yaw},
-	};
+	// PX4_INFO("yaw %.2f", (double)yaw);
+	// PX4_INFO("pitch %.2f", (double)pitch);
+	// PX4_INFO("roll %.2f", (double)roll);
 
-	writeMsp(encoder, writer, MspStatus {
-		.time = static_cast<uint16_t>(vehicle_status.timestamp),
-		.flightModes = flightModes
-	});
-        layout.tick(params);
-        painter.draw(layout);
+	const size_t FLIGHT_MODES_SIZE = 1;
+	FlightModeFlag flightModes[FLIGHT_MODES_SIZE] = {FlightModeFlag::_3D};
+
+	osd.setTime(static_cast<uint16_t>(vehicle_status.timestamp));
+	osd.setArmed(vehicle_status.arming_state == vehicle_status_s::ARMING_STATE_ARMED);
+	osd.setFlightMode(mode_util::nav_state_names[vehicle_status.nav_state], flightModes, FLIGHT_MODES_SIZE);
+	osd.setBattery(battery_status.voltage_v * 10, battery_status.current_a * 100);
+	osd.setAttitude(pitch, roll, yaw);
+
+	osd.draw();
+
+	// std::set<FlightModeFlag> flightModes{FlightModeFlag::_3D};
+	// OsdParams params {
+	// 	.armed = vehicle_status.arming_state == vehicle_status_s::ARMING_STATE_ARMED,
+	// 	.flightMode = mode_util::nav_state_names[vehicle_status.nav_state],
+	// 	.battery = OsdBatteryParams{battery_status.voltage_v * 10, battery_status.current_a * 100},
+	// 	.attitude = OsdAttitudeParams{pitch, roll, yaw},
+	// };
+
+	// writeMsp(encoder, writer, MspStatus {
+	// 	.time = static_cast<uint16_t>(vehicle_status.timestamp),
+	// 	.flightModes = flightModes
+	// });
+        // layout.tick(params);
+        // painter.draw(layout);
 }
 
 // void MspOsd::Send(const unsigned int message_type, const void *payload)
@@ -554,7 +564,7 @@ $ msp_osd_custom
 	return 0;
 }
 
-extern "C" __EXPORT int msp_osd_custom_main(int argc, char *argv[])
+extern "C" __EXPORT int canvas_osd_main(int argc, char *argv[])
 {
 	return MspOsd::main(argc, argv);
 }

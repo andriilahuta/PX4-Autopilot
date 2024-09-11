@@ -30,8 +30,19 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 ############################################################################
+# add_compile_options(-std=c++17)
+# include_directories(BEFORE SYSTEM "/opt/gcc/arm-none-eabi/include/c++/9.3.1")
+set(CMAKE_CXX_STANDARD 17)
 
-# add_subdirectory(MessageDisplay)
+add_subdirectory(osdlib)
+
+add_library(libstdc++ STATIC IMPORTED)
+separate_arguments(cpu_flags_list UNIX_COMMAND ${cpu_flags})
+execute_process(COMMAND ${CMAKE_CXX_COMPILER} ${cpu_flags_list} -print-file-name=libstdc++_nano.a OUTPUT_VARIABLE LIBSTDCCXX_LOCATION COMMAND_ECHO STDOUT)
+string(STRIP ${LIBSTDCCXX_LOCATION} LIBSTDCCXX_LOCATION)
+# message(OSD_COMPILE_FLAGS_1="${LIBSTDCCXX_LOCATION}")
+# message(OSD_COMPILE_FLAGS_2="${CMAKE_CXX_COMPILER} ${cpu_flags_list}")
+set_target_properties(libstdc++ PROPERTIES IMPORTED_LOCATION ${LIBSTDCCXX_LOCATION})
 
 px4_add_module(
 	MODULE drivers__osd__canvas_osd
@@ -40,10 +51,33 @@ px4_add_module(
 		msp_osd.cpp
 		MspV1.cpp
 		uorb_to_msp.cpp
-		msp.cpp utils.cpp osd/layout.cpp osd/utils.cpp osd/elements/base.cpp osd/elements/objects.cpp
+		# osd/layout.cpp osd/utils.cpp osd/elements/base.cpp osd/elements/objects.cpp
+	# INCLUDES
+		# /opt/gcc/arm-none-eabi/include/c++/9.3.1/
+	# COMPILE_FLAGS
+		# -std=c++17
+		# -luClibc++
+		# -static-libgcc
+		# -static-libstdc++
+	# LINK_FLAGS
+	# 	-Wl,--gc-sections
+	# 	-static -static-libgcc -static-libstdc++
 	MODULE_CONFIG
 		module.yaml
 	DEPENDS
-		# message_display
 		px4_work_queue
+		osdlib
+		libstdc++
 	)
+# target_link_options(drivers__osd__canvas_osd PRIVATE -static-libgcc -static-libstdc++)
+# get_target_property(OSD_COMPILE_FLAGS drivers__osd__canvas_osd COMPILE_OPTIONS)
+
+# list(JOIN OSD_COMPILE_FLAGS ", " OSD_COMPILE_FLAGS_1)
+# message(OSD_COMPILE_FLAGS_1="${OSD_COMPILE_FLAGS_1}")
+
+# list(REMOVE_ITEM OSD_COMPILE_FLAGS "$<$<COMPILE_LANGUAGE:CXX>:-nostdinc++>")
+
+# list(JOIN OSD_COMPILE_FLAGS ", " OSD_COMPILE_FLAGS_2)
+# message(OSD_COMPILE_FLAGS_2="${OSD_COMPILE_FLAGS_2}")
+
+# set_target_properties(drivers__osd__canvas_osd PROPERTIES COMPILE_OPTIONS "${OSD_COMPILE_FLAGS}")
