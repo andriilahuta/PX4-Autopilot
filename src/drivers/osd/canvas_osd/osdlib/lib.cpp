@@ -5,7 +5,7 @@
 #include "msp.hpp"
 #include "osd/layout.hpp"
 #include "osd/utils.hpp"
-#include "compat/format.hpp"
+#include "../compatlib/format.hpp"
 
 
 Osd::Osd(int fd) {

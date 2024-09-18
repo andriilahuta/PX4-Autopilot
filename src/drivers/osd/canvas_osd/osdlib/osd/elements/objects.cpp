@@ -1,7 +1,7 @@
 #include <algorithm>
 #include "objects.hpp"
 #include "../../utils.hpp"
-#include "../../compat/format.hpp"
+#include "../../../compatlib/format.hpp"
 
 
 OsdText::OsdText(std::string value):

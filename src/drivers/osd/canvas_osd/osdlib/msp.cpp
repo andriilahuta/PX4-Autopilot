@@ -1,8 +1,8 @@
 #include <cstddef>
 #include <unistd.h>
 #include "msp.hpp"
-#include "compat/container.hpp"
-#include "compat/span.hpp"
+#include "../compatlib/container.hpp"
+#include "../compatlib/span.hpp"
 
 
 static std::byte mspSerialChecksumBuf(const auto& data, std::byte checksum = std::byte{0}) {
