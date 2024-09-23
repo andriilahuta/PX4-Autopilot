@@ -33,7 +33,9 @@
 #include <ctype.h>
 #include <nuttx/fs/fs.h>
 
-// #include "libc.h"
+#include "libc.h"
+
+#ifdef CONFIG_FILE_STREAM
 
 /****************************************************************************
  * Public Functions
@@ -104,3 +106,5 @@ wint_t fputwc(wchar_t c, FAR FILE *f)
   funlockfile(f);
   return wc;
 }
+
+#endif /* CONFIG_FILE_STREAM */

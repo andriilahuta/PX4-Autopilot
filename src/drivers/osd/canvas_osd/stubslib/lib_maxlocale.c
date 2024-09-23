@@ -26,6 +26,8 @@
 
 #include <stdlib.h>
 
+#ifdef CONFIG_LIBC_LOCALE
+
 /****************************************************************************
  * Private Functions
  ****************************************************************************/
@@ -39,3 +41,5 @@ int __locale_mb_cur_max(void)
 {
   return MB_CUR_MAX;
 }
+
+#endif

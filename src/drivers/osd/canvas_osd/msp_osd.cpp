@@ -554,11 +554,11 @@ Converts uORB messages to MSP telemetry packets
 
 ### Examples
 CLI usage example:
-$ msp_osd_custom
+$ canvas_osd
 
 )DESCR_STR");
 
-	PRINT_MODULE_USAGE_NAME("msp_osd_custom", "driver");
+	PRINT_MODULE_USAGE_NAME("canvas_osd", "driver");
 	PRINT_MODULE_USAGE_DEFAULT_COMMANDS();
 
 	return 0;

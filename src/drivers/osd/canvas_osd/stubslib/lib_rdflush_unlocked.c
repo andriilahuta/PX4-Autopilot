@@ -29,6 +29,8 @@
 #include <unistd.h>
 #include <errno.h>
 
+#include "libc.h"
+
 #ifndef CONFIG_STDIO_DISABLE_BUFFERING
 
 /****************************************************************************

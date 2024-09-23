@@ -26,12 +26,13 @@
 
 #include <sys/types.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
 
 #include <nuttx/fs/fs.h>
+
+#include "libc.h"
 
 /****************************************************************************
  * Public Functions

@@ -32,6 +32,7 @@
 #include <errno.h>
 #include <string.h>
 
+#ifdef CONFIG_FILE_STREAM
 
 /****************************************************************************
  * Public Functions
@@ -117,3 +118,5 @@ wint_t fgetwc(FAR FILE *f)
   funlockfile(f);
   return c;
 }
+
+#endif /* CONFIG_FILE_STREAM */

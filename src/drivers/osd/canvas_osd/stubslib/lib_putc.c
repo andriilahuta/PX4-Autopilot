@@ -28,11 +28,6 @@
  * Public Functions
  ****************************************************************************/
 
-int putc(int c, FAR FILE *stream)
-{
-  return fputc(c, stream);
-}
-
 int putc_unlocked(int c, FAR FILE *stream)
 {
   return fputc_unlocked(c, stream);

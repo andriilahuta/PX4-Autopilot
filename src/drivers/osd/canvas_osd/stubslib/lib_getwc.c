@@ -30,6 +30,7 @@
 
 #include <wchar.h>
 
+#ifdef CONFIG_FILE_STREAM
 
 /****************************************************************************
  * Public Functions
@@ -55,3 +56,5 @@ wint_t getwc(FAR FILE *f)
 {
   return fgetwc(f);
 }
+
+#endif /* CONFIG_FILE_STREAM */

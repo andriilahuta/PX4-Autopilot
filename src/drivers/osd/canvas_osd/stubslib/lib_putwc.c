@@ -31,6 +31,8 @@
 #include <wchar.h>
 #include <stdio.h>
 
+#ifdef CONFIG_FILE_STREAM
+
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
@@ -80,3 +82,5 @@ wint_t putwc(wchar_t c, FAR FILE *f)
   funlockfile(f);
   return wc;
 }
+
+#endif /* CONFIG_FILE_STREAM */

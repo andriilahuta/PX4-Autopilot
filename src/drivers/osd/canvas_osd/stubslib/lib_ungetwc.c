@@ -34,6 +34,8 @@
 #include <fcntl.h>
 #include <string.h>
 
+#ifdef CONFIG_FILE_STREAM
+
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
@@ -119,3 +121,5 @@ wint_t ungetwc(wint_t wc, FAR FILE *f)
   funlockfile(f);
   return ret;
 }
+
+#endif /* CONFIG_FILE_STREAM */

@@ -25,9 +25,10 @@
 #include <nuttx/config.h>
 
 #include <stdbool.h>
-#include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
+
+#include "libc.h"
 
 /****************************************************************************
  * Public Functions
