@@ -128,6 +128,29 @@ MspOsd::MspOsd(const char *device) :
 
 	// _is_initialized = true;
 	PX4_INFO("MSP OSD running on %s", _device);
+
+
+
+	// // for (int i = 0; i < 5; i++) {
+	// PX4_INFO("11111111111111111");
+	// sleep(2);
+	// Osd osd(0);
+	// PX4_INFO("22222222222222222");
+	// sleep(2);
+	// // osd = Osd(_msp_fd);
+	// // Osd osd(0);
+	// // PX4_INFO("33333333333333333");
+	// // sleep(2);
+	// // osd.print();
+	// // PX4_INFO("44444444444444444");
+	// // sleep(2);
+	// osd.setBlinkerEnabled(true);
+	// PX4_INFO("33333333333333333");
+	// sleep(2);
+	// osd.print();
+	// PX4_INFO("55555555555555555");
+	// sleep(2);
+	// // }
 }
 
 MspOsd::~MspOsd()
@@ -239,38 +262,43 @@ void MspOsd::Run()
 	}
 
 	// Check if parameters have changed
-	if (_parameter_update_sub.updated()) {
-		// clear update
-		parameter_update_s param_update;
-		_parameter_update_sub.copy(&param_update);
-		updateParams(); // update module parameters (in DEFINE_PARAMETERS)
-		parameters_update();
-	}
+	// if (_parameter_update_sub.updated()) {
+	// 	// clear update
+	// 	parameter_update_s param_update;
+	// 	_parameter_update_sub.copy(&param_update);
+	// 	updateParams(); // update module parameters (in DEFINE_PARAMETERS)
+	// 	parameters_update();
+	// }
 
-	// perform first time initialization, if needed
-	if (!_is_initialized) {
-		struct termios t;
-		_msp_fd = open(_device, O_RDWR | O_NONBLOCK);
+	// // perform first time initialization, if needed
+	// if (!_is_initialized) {
+	// 	struct termios t;
+	// 	_msp_fd = open(_device, O_RDWR | O_NONBLOCK);
 
-		if (_msp_fd < 0) {
-			_performance_data.initialization_problems = true;
-			return;
-		}
+	// 	if (_msp_fd < 0) {
+	// 		_performance_data.initialization_problems = true;
+	// 		return;
+	// 	}
 
-		tcgetattr(_msp_fd, &t);
-		cfsetspeed(&t, B115200);
-		t.c_cflag &= ~(CSTOPB | PARENB | CRTSCTS);
-		t.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
-		t.c_iflag &= ~(IGNBRK | BRKINT | ICRNL | INLCR | PARMRK | INPCK | ISTRIP | IXON);
-		t.c_oflag = 0;
-		tcsetattr(_msp_fd, TCSANOW, &t);
+	// 	tcgetattr(_msp_fd, &t);
+	// 	cfsetspeed(&t, B115200);
+	// 	t.c_cflag &= ~(CSTOPB | PARENB | CRTSCTS);
+	// 	t.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
+	// 	t.c_iflag &= ~(IGNBRK | BRKINT | ICRNL | INLCR | PARMRK | INPCK | ISTRIP | IXON);
+	// 	t.c_oflag = 0;
+	// 	tcsetattr(_msp_fd, TCSANOW, &t);
 
-		// _msp = MspV1(_msp_fd);
-		osd = Osd(_msp_fd);
-		osd.setBlinkerEnabled(true);
+	// 	// _msp = MspV1(_msp_fd);
+	// 	PX4_INFO("11111111111111111");
+	// 	// Osd osd{0};
+	// 	PX4_INFO("22222222222222222");
+	// 	// osd = Osd(_msp_fd);
+	// 	PX4_INFO("33333333333333333");
+	// 	// osd.setBlinkerEnabled(true);
+	// 	PX4_INFO("44444444444444444");
 
-		_is_initialized = true;
-	}
+	// 	_is_initialized = true;
+	// }
 
 	// avoid premature pessimization; if skip processing if we're effectively disabled
 	// if (_param_osd_symbols.get() == 0) {
@@ -279,14 +307,14 @@ void MspOsd::Run()
 
 	// update display message
 	// {
-		vehicle_status_s vehicle_status{};
-		_vehicle_status_sub.copy(&vehicle_status);
+		// vehicle_status_s vehicle_status{};
+		// _vehicle_status_sub.copy(&vehicle_status);
 
 		// vehicle_attitude_s vehicle_attitude{};
 		// _vehicle_attitude_sub.copy(&vehicle_attitude);
 
-		log_message_s log_message{};
-		_log_message_sub.copy(&log_message);
+		// log_message_s log_message{};
+		// _log_message_sub.copy(&log_message);
 
 		// const auto display_message = msp_osd::construct_display_message(
 		// 				     vehicle_status,
@@ -314,11 +342,11 @@ void MspOsd::Run()
 
 	// MSP_ANALOG
 	// {
-		battery_status_s battery_status{};
-		_battery_status_sub.copy(&battery_status);
+		// battery_status_s battery_status{};
+		// _battery_status_sub.copy(&battery_status);
 
-		input_rc_s input_rc{};
-		_input_rc_sub.copy(&input_rc);
+		// input_rc_s input_rc{};
+		// _input_rc_sub.copy(&input_rc);
 
 		// const auto msg = msp_osd::construct_ANALOG(
 		// 			 battery_status,
@@ -337,11 +365,11 @@ void MspOsd::Run()
 
 	// MSP_RAW_GPS
 	// {
-		sensor_gps_s vehicle_gps_position{};
-		_vehicle_gps_position_sub.copy(&vehicle_gps_position);
+		// sensor_gps_s vehicle_gps_position{};
+		// _vehicle_gps_position_sub.copy(&vehicle_gps_position);
 
-		airspeed_validated_s airspeed_validated{};
-		_airspeed_validated_sub.copy(&airspeed_validated);
+		// airspeed_validated_s airspeed_validated{};
+		// _airspeed_validated_sub.copy(&airspeed_validated);
 
 		// const auto msg = msp_osd::construct_RAW_GPS(
 		// 			 vehicle_gps_position,
@@ -354,11 +382,11 @@ void MspOsd::Run()
 		// update heartbeat
 		// _heartbeat = !_heartbeat;
 
-		home_position_s home_position{};
-		_home_position_sub.copy(&home_position);
+		// home_position_s home_position{};
+		// _home_position_sub.copy(&home_position);
 
-		vehicle_global_position_s vehicle_global_position{};
-		_vehicle_global_position_sub.copy(&vehicle_global_position);
+		// vehicle_global_position_s vehicle_global_position{};
+		// _vehicle_global_position_sub.copy(&vehicle_global_position);
 
 		// construct and send message
 	// 	const auto msg = msp_osd::construct_COMP_GPS(
@@ -370,8 +398,8 @@ void MspOsd::Run()
 
 	// MSP_ATTITUDE
 	// {
-		vehicle_attitude_s vehicle_attitude{};
-		_vehicle_attitude_sub.copy(&vehicle_attitude);
+		// vehicle_attitude_s vehicle_attitude{};
+		// _vehicle_attitude_sub.copy(&vehicle_attitude);
 
 	// 	const auto msg = msp_osd::construct_ATTITUDE(vehicle_attitude);
 	// 	this->Send(MSP_ATTITUDE, &msg);
@@ -382,8 +410,8 @@ void MspOsd::Run()
 		// sensor_gps_s vehicle_gps_position{};
 		// _vehicle_gps_position_sub.copy(&vehicle_gps_position);
 
-		vehicle_local_position_s vehicle_local_position{};
-		_vehicle_local_position_sub.copy(&vehicle_local_position);
+		// vehicle_local_position_s vehicle_local_position{};
+		// _vehicle_local_position_sub.copy(&vehicle_local_position);
 
 		// construct and send message
 	// 	const auto msg = msp_osd::construct_ALTITUDE(vehicle_gps_position, vehicle_local_position);
@@ -399,30 +427,30 @@ void MspOsd::Run()
 	// send full configuration
 	// SendConfig();
 
-	const auto now = hrt_absolute_time();
-	if (vehicle_status.timestamp < (now - 1_s)) {
-		return;
-	}
+	// const auto now = hrt_absolute_time();
+	// if (vehicle_status.timestamp < (now - 1_s)) {
+	// 	return;
+	// }
 
-	matrix::Eulerf euler_attitude(matrix::Quatf(vehicle_attitude.q));
-	const auto yaw = math::degrees(euler_attitude.psi());
-	const auto pitch = math::degrees(euler_attitude.theta());
-	const auto roll = math::degrees(euler_attitude.phi());
+	// matrix::Eulerf euler_attitude(matrix::Quatf(vehicle_attitude.q));
+	// const auto yaw = math::degrees(euler_attitude.psi());
+	// const auto pitch = math::degrees(euler_attitude.theta());
+	// const auto roll = math::degrees(euler_attitude.phi());
 
 	// PX4_INFO("yaw %.2f", (double)yaw);
 	// PX4_INFO("pitch %.2f", (double)pitch);
 	// PX4_INFO("roll %.2f", (double)roll);
 
-	const size_t FLIGHT_MODES_SIZE = 1;
-	FlightModeFlag flightModes[FLIGHT_MODES_SIZE] = {FlightModeFlag::_3D};
+	// const size_t FLIGHT_MODES_SIZE = 1;
+	// FlightModeFlag flightModes[FLIGHT_MODES_SIZE] = {FlightModeFlag::_3D};
 
-	osd.setTime(static_cast<uint16_t>(vehicle_status.timestamp));
-	osd.setArmed(vehicle_status.arming_state == vehicle_status_s::ARMING_STATE_ARMED);
-	osd.setFlightMode(mode_util::nav_state_names[vehicle_status.nav_state], flightModes, FLIGHT_MODES_SIZE);
-	osd.setBattery(battery_status.voltage_v * 10, battery_status.current_a * 100);
-	osd.setAttitude(pitch, roll, yaw);
+	// osd.setTime(static_cast<uint16_t>(vehicle_status.timestamp));
+	// osd.setArmed(vehicle_status.arming_state == vehicle_status_s::ARMING_STATE_ARMED);
+	// osd.setFlightMode(mode_util::nav_state_names[vehicle_status.nav_state], flightModes, FLIGHT_MODES_SIZE);
+	// osd.setBattery(battery_status.voltage_v * 10, battery_status.current_a * 100);
+	// osd.setAttitude(pitch, roll, yaw);
 
-	osd.draw();
+	// osd.draw();
 
 	// std::set<FlightModeFlag> flightModes{FlightModeFlag::_3D};
 	// OsdParams params {
@@ -566,5 +594,34 @@ $ canvas_osd
 
 extern "C" __EXPORT int canvas_osd_main(int argc, char *argv[])
 {
-	return MspOsd::main(argc, argv);
+	// return MspOsd::main(argc, argv);
+
+
+
+	for (int i = 0; i < 100; i++) {
+		PX4_INFO("print===v5---%d", i + 1);
+		sleep(2);
+	// }
+
+	PX4_INFO("11111111111111111");
+	sleep(2);
+	Osd osd(0);
+	PX4_INFO("22222222222222222");
+	sleep(2);
+	// osd = Osd(_msp_fd);
+	// Osd osd(0);
+	// PX4_INFO("33333333333333333");
+	// sleep(2);
+	// osd.print();
+	// PX4_INFO("44444444444444444");
+	// sleep(2);
+	osd.setBlinkerEnabled(true);
+	// PX4_INFO("33333333333333333");
+	// sleep(2);
+	// osd.setBattery(1.0, 2.0);
+	PX4_INFO("55555555555555555");
+	sleep(2);
+	}
+
+	return 0;
 }

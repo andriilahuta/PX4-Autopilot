@@ -10,6 +10,13 @@ execute_process(
 	OUTPUT_VARIABLE LIBSTDCCXX_LOCATION
 )
 string(STRIP ${LIBSTDCCXX_LOCATION} LIBSTDCCXX_LOCATION)
+if ("${LIBSTDCCXX_LOCATION}" STREQUAL "libstdc++_nano.a")
+	execute_process(
+		COMMAND ${CMAKE_CXX_COMPILER} ${cpu_flags_list} -print-file-name=libstdc++.a
+		OUTPUT_VARIABLE LIBSTDCCXX_LOCATION
+	)
+	string(STRIP ${LIBSTDCCXX_LOCATION} LIBSTDCCXX_LOCATION)
+endif()
 set_target_properties(libstdc++ PROPERTIES IMPORTED_LOCATION ${LIBSTDCCXX_LOCATION})
 
 px4_add_module(

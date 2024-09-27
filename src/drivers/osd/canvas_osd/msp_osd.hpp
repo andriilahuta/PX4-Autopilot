@@ -135,9 +135,9 @@ private:
 	// convenience function to check if a given symbol is enabled
 	bool enabled(const SymbolIndex &symbol);
 
-	MspV1 _msp{0};
+	// MspV1 _msp{0};
 
-	Osd osd{0};
+	// Osd osd{0};
 
 	int _msp_fd{-1};
 
