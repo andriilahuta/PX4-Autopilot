@@ -16,15 +16,15 @@ Osd::Osd(int fd) {
 
     // painter = new OsdLayoutPainter(*encoder, *writer);
     layouts = new OsdLayout*[1];
-    // layouts[0] = new OsdPrimaryLayout(OsdPrimaryLayoutConfig {
-	// 	.elements = {
-	// 	    // {OsdLayoutElement::COMPASS, {12, 0}, nullptr},
-	// 	    // {OsdLayoutElement::HORIZON, {23, 8}, std::make_shared<OsdHorizonConfig>(true)},
-	// 	    // {OsdLayoutElement::CROSSHAIRS, {20, 8}, nullptr},
-	// 	    // {OsdLayoutElement::BATTERY_INFO, {0, 0}, std::make_shared<OsdBatteryConfig>(false)},
-	// 	    // {OsdLayoutElement::ARMING_STATUS, {14, 15}, nullptr},
-	// 	}
-	// });
+    layouts[0] = new OsdPrimaryLayout(OsdPrimaryLayoutConfig {
+		.elements = {
+		    {OsdLayoutElement::COMPASS, {12, 0}, nullptr},
+		    {OsdLayoutElement::HORIZON, {23, 8}, std::make_shared<OsdHorizonConfig>(true)},
+		    {OsdLayoutElement::CROSSHAIRS, {20, 8}, nullptr},
+		    {OsdLayoutElement::BATTERY_INFO, {0, 0}, std::make_shared<OsdBatteryConfig>(false)},
+		    {OsdLayoutElement::ARMING_STATUS, {14, 15}, nullptr},
+		}
+	});
     layoutsSize = 1;
     currentLayout = 0;
 
@@ -35,7 +35,7 @@ Osd::~Osd() {
     delete params;
     // if (flightModes != nullptr) delete[] flightModes;
 
-    // for (size_t i = 0; i < layoutsSize; i++) delete layouts[i];
+    for (size_t i = 0; i < layoutsSize; i++) delete layouts[i];
     delete[] layouts;
     // delete painter;
 

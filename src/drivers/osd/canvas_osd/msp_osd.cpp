@@ -599,7 +599,7 @@ extern "C" __EXPORT int canvas_osd_main(int argc, char *argv[])
 
 
 	for (int i = 0; i < 100; i++) {
-		PX4_INFO("print===v5---%d", i + 1);
+		PX4_INFO("print===v1---%d", i + 1);
 		sleep(2);
 	// }
 

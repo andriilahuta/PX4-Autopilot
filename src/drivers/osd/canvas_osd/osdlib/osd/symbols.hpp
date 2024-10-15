@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 
 enum struct OsdFontLevel : uint8_t {
     NORMAL,
