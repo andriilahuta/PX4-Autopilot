@@ -30,7 +30,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  ****************************************************************************/
-#ifndef PX4_NUTTX_NEW
+// #warning "------------------------------------------PX4_NUTTX_NEW--------------------------------------"
+// #ifndef PX4_NUTTX_NEW
 
 #include <cstddef>
 
@@ -39,4 +40,4 @@ inline void* operator new[](std::size_t, void* ptr) { return ptr; }
 inline void  operator delete  (void*, void*) {}
 inline void  operator delete[](void*, void*) {}
 
-#endif
+// #endif

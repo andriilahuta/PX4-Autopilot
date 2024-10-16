@@ -23,20 +23,12 @@
  ****************************************************************************/
 
 #include <nuttx/config.h>
-
 #include <ctype.h>
+#include "lib_ctype.h"
 
 /****************************************************************************
  * Private Types
  ****************************************************************************/
-#define _U  01
-#define _L  02
-#define _N  04
-#define _S  010
-#define _P  020
-#define _C  040
-#define _X  0100
-#define _B  0200
 
 /* GNU libstdc++ is expecting an array _ctype_ to be defined. This array
  * is usually defined in GNU libc or newlib.

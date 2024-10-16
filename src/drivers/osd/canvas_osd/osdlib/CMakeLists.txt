@@ -3,14 +3,16 @@ message("1---------------------${PX4_SOURCE_DIR}/src/include")
 get_directory_property(DIR_COMPILE_OPTIONS COMPILE_OPTIONS)
 # message("1---------------------${DIR_COMPILE_OPTIONS}")
 # list(REMOVE_ITEM DIR_COMPILE_OPTIONS "-include visibility.h")
+# list(APPEND DIR_COMPILE_OPTIONS -include lib_ctype.h)
 list(REMOVE_ITEM DIR_COMPILE_OPTIONS "$<$<COMPILE_LANGUAGE:CXX>:-nostdinc++>")
 list(REMOVE_ITEM DIR_COMPILE_OPTIONS "$<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>")
 list(REMOVE_ITEM DIR_COMPILE_OPTIONS "-Werror")
 message("2---------------------${DIR_COMPILE_OPTIONS}")
 
-# get_directory_property(DIR_INCLUDE_DIRECTORIES INCLUDE_DIRECTORIES)
-# list(REMOVE_ITEM DIR_INCLUDE_DIRECTORIES "${PX4_SOURCE_DIR}/platforms/nuttx/NuttX/include/cxx")
-# message("3---------------------${DIR_INCLUDE_DIRECTORIES}")
+get_directory_property(DIR_INCLUDE_DIRECTORIES INCLUDE_DIRECTORIES)
+list(REMOVE_ITEM DIR_INCLUDE_DIRECTORIES "${PX4_SOURCE_DIR}/platforms/nuttx/NuttX/include/cxx")
+list(REMOVE_ITEM DIR_INCLUDE_DIRECTORIES "${PX4_SOURCE_DIR}/platforms/nuttx/NuttX/nuttx/include/cxx")
+message("3---------------------${DIR_INCLUDE_DIRECTORIES}")
 
 
 
@@ -18,7 +20,7 @@ set_directory_properties(
 	PROPERTIES
 	# INCLUDE_DIRECTORIES ""
 	# COMPILE_OPTIONS ""
-	# INCLUDE_DIRECTORIES "${DIR_INCLUDE_DIRECTORIES}"
+	INCLUDE_DIRECTORIES "${DIR_INCLUDE_DIRECTORIES}"
 	COMPILE_OPTIONS "${DIR_COMPILE_OPTIONS}"
 )
 remove_definitions(
@@ -26,7 +28,8 @@ remove_definitions(
 	# -D_SYS_REENT_H_
 	# -D__CUSTOM_FILE_IO__
 )
-add_definitions(-DPX4_NUTTX_NEW)
+add_definitions(-D_STDLIB_H_)
+add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:SHELL:-include ${CMAKE_CURRENT_SOURCE_DIR}/../stubslib/lib_ctype.h>")
 
 
 
