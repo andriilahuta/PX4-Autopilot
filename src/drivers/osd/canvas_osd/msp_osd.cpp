@@ -599,7 +599,7 @@ extern "C" __EXPORT int canvas_osd_main(int argc, char *argv[])
 
 
 	for (int i = 0; i < 100; i++) {
-		PX4_INFO("print===v1---%d", i + 1);
+		PX4_INFO("print===v2---%d", i + 1);
 		sleep(2);
 	// }
 
@@ -617,8 +617,8 @@ extern "C" __EXPORT int canvas_osd_main(int argc, char *argv[])
 	// sleep(2);
 	osd.setBlinkerEnabled(true);
 	// PX4_INFO("33333333333333333");
-	// sleep(2);
-	// osd.setBattery(1.0, 2.0);
+	sleep(2);
+	osd.setBattery(1.0, 2.0);
 	PX4_INFO("55555555555555555");
 	sleep(2);
 	}

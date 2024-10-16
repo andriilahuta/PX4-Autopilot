@@ -2,11 +2,15 @@ get_directory_property(DIR_COMPILE_OPTIONS COMPILE_OPTIONS)
 list(REMOVE_ITEM DIR_COMPILE_OPTIONS "$<$<COMPILE_LANGUAGE:CXX>:-nostdinc++>")
 list(REMOVE_ITEM DIR_COMPILE_OPTIONS "-Werror")
 
+get_directory_property(DIR_INCLUDE_DIRECTORIES INCLUDE_DIRECTORIES)
+list(REMOVE_ITEM DIR_INCLUDE_DIRECTORIES "${PX4_SOURCE_DIR}/platforms/nuttx/NuttX/include/cxx")
+list(REMOVE_ITEM DIR_INCLUDE_DIRECTORIES "${PX4_SOURCE_DIR}/platforms/nuttx/NuttX/nuttx/include/cxx")
+
 set_directory_properties(
 	PROPERTIES
 	# INCLUDE_DIRECTORIES ""
 	# COMPILE_OPTIONS ""
-	# INCLUDE_DIRECTORIES "${PX4_SOURCE_DIR}/src/include"
+	INCLUDE_DIRECTORIES "${DIR_INCLUDE_DIRECTORIES}"
 	COMPILE_OPTIONS "${DIR_COMPILE_OPTIONS}"
 )
 remove_definitions(
@@ -14,6 +18,7 @@ remove_definitions(
 	# -D_SYS_REENT_H_
 	# -D__CUSTOM_FILE_IO__
 )
+add_definitions(-D_STDLIB_H_)
 
 if(${PX4_PLATFORM} STREQUAL "nuttx")
 	px4_add_library(
