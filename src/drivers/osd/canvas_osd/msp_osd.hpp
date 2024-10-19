@@ -137,7 +137,7 @@ private:
 
 	// MspV1 _msp{0};
 
-	// Osd osd{0};
+	Osd osd{0};
 
 	int _msp_fd{-1};
 

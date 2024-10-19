@@ -270,35 +270,35 @@ void MspOsd::Run()
 	// 	parameters_update();
 	// }
 
-	// // perform first time initialization, if needed
-	// if (!_is_initialized) {
-	// 	struct termios t;
-	// 	_msp_fd = open(_device, O_RDWR | O_NONBLOCK);
+	// perform first time initialization, if needed
+	if (!_is_initialized) {
+		struct termios t;
+		_msp_fd = open(_device, O_RDWR | O_NONBLOCK);
 
-	// 	if (_msp_fd < 0) {
-	// 		_performance_data.initialization_problems = true;
-	// 		return;
-	// 	}
+		if (_msp_fd < 0) {
+			// _performance_data.initialization_problems = true;
+			return;
+		}
 
-	// 	tcgetattr(_msp_fd, &t);
-	// 	cfsetspeed(&t, B115200);
-	// 	t.c_cflag &= ~(CSTOPB | PARENB | CRTSCTS);
-	// 	t.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
-	// 	t.c_iflag &= ~(IGNBRK | BRKINT | ICRNL | INLCR | PARMRK | INPCK | ISTRIP | IXON);
-	// 	t.c_oflag = 0;
-	// 	tcsetattr(_msp_fd, TCSANOW, &t);
+		tcgetattr(_msp_fd, &t);
+		cfsetspeed(&t, B115200);
+		t.c_cflag &= ~(CSTOPB | PARENB | CRTSCTS);
+		t.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
+		t.c_iflag &= ~(IGNBRK | BRKINT | ICRNL | INLCR | PARMRK | INPCK | ISTRIP | IXON);
+		t.c_oflag = 0;
+		tcsetattr(_msp_fd, TCSANOW, &t);
 
 	// 	// _msp = MspV1(_msp_fd);
 	// 	PX4_INFO("11111111111111111");
 	// 	// Osd osd{0};
 	// 	PX4_INFO("22222222222222222");
-	// 	// osd = Osd(_msp_fd);
+		osd = Osd(_msp_fd);
 	// 	PX4_INFO("33333333333333333");
-	// 	// osd.setBlinkerEnabled(true);
+		osd.setBlinkerEnabled(true);
 	// 	PX4_INFO("44444444444444444");
 
-	// 	_is_initialized = true;
-	// }
+		_is_initialized = true;
+	}
 
 	// avoid premature pessimization; if skip processing if we're effectively disabled
 	// if (_param_osd_symbols.get() == 0) {
@@ -432,25 +432,36 @@ void MspOsd::Run()
 	// 	return;
 	// }
 
+
+
+
+		vehicle_status_s vehicle_status{};
+		_vehicle_status_sub.copy(&vehicle_status);
+
+		vehicle_attitude_s vehicle_attitude{};
+		_vehicle_attitude_sub.copy(&vehicle_attitude);
+
+		battery_status_s battery_status{};
+		_battery_status_sub.copy(&battery_status);
+
 	// matrix::Eulerf euler_attitude(matrix::Quatf(vehicle_attitude.q));
 	// const auto yaw = math::degrees(euler_attitude.psi());
 	// const auto pitch = math::degrees(euler_attitude.theta());
 	// const auto roll = math::degrees(euler_attitude.phi());
 
-	// PX4_INFO("yaw %.2f", (double)yaw);
-	// PX4_INFO("pitch %.2f", (double)pitch);
-	// PX4_INFO("roll %.2f", (double)roll);
-
 	// const size_t FLIGHT_MODES_SIZE = 1;
 	// FlightModeFlag flightModes[FLIGHT_MODES_SIZE] = {FlightModeFlag::_3D};
 
-	// osd.setTime(static_cast<uint16_t>(vehicle_status.timestamp));
+	osd.setTime(static_cast<uint16_t>(vehicle_status.timestamp));
 	// osd.setArmed(vehicle_status.arming_state == vehicle_status_s::ARMING_STATE_ARMED);
 	// osd.setFlightMode(mode_util::nav_state_names[vehicle_status.nav_state], flightModes, FLIGHT_MODES_SIZE);
 	// osd.setBattery(battery_status.voltage_v * 10, battery_status.current_a * 100);
 	// osd.setAttitude(pitch, roll, yaw);
 
 	// osd.draw();
+
+
+
 
 	// std::set<FlightModeFlag> flightModes{FlightModeFlag::_3D};
 	// OsdParams params {
@@ -594,34 +605,34 @@ $ canvas_osd
 
 extern "C" __EXPORT int canvas_osd_main(int argc, char *argv[])
 {
-	// return MspOsd::main(argc, argv);
+	return MspOsd::main(argc, argv);
 
 
 
-	for (int i = 0; i < 100; i++) {
-		PX4_INFO("print===v2---%d", i + 1);
-		sleep(2);
+	// for (int i = 0; i < 100; i++) {
+	// 	PX4_INFO("print===v2---%d", i + 1);
+	// 	sleep(2);
+	// // }
+
+	// PX4_INFO("11111111111111111");
+	// sleep(2);
+	// Osd osd(0);
+	// PX4_INFO("22222222222222222");
+	// sleep(2);
+	// // osd = Osd(_msp_fd);
+	// // Osd osd(0);
+	// // PX4_INFO("33333333333333333");
+	// // sleep(2);
+	// // osd.print();
+	// // PX4_INFO("44444444444444444");
+	// // sleep(2);
+	// osd.setBlinkerEnabled(true);
+	// // PX4_INFO("33333333333333333");
+	// sleep(2);
+	// osd.setBattery(1.0, 2.0);
+	// PX4_INFO("55555555555555555");
+	// sleep(2);
 	// }
 
-	PX4_INFO("11111111111111111");
-	sleep(2);
-	Osd osd(0);
-	PX4_INFO("22222222222222222");
-	sleep(2);
-	// osd = Osd(_msp_fd);
-	// Osd osd(0);
-	// PX4_INFO("33333333333333333");
-	// sleep(2);
-	// osd.print();
-	// PX4_INFO("44444444444444444");
-	// sleep(2);
-	osd.setBlinkerEnabled(true);
-	// PX4_INFO("33333333333333333");
-	sleep(2);
-	osd.setBattery(1.0, 2.0);
-	PX4_INFO("55555555555555555");
-	sleep(2);
-	}
-
-	return 0;
+	// return 0;
 }
