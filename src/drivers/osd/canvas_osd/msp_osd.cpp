@@ -444,21 +444,23 @@ void MspOsd::Run()
 		battery_status_s battery_status{};
 		_battery_status_sub.copy(&battery_status);
 
-	// matrix::Eulerf euler_attitude(matrix::Quatf(vehicle_attitude.q));
-	// const auto yaw = math::degrees(euler_attitude.psi());
-	// const auto pitch = math::degrees(euler_attitude.theta());
-	// const auto roll = math::degrees(euler_attitude.phi());
+	matrix::Eulerf euler_attitude(matrix::Quatf(vehicle_attitude.q));
+	const auto yaw = math::degrees(euler_attitude.psi());
+	const auto pitch = math::degrees(euler_attitude.theta());
+	const auto roll = math::degrees(euler_attitude.phi());
 
-	// const size_t FLIGHT_MODES_SIZE = 1;
-	// FlightModeFlag flightModes[FLIGHT_MODES_SIZE] = {FlightModeFlag::_3D};
+	const size_t FLIGHT_MODES_SIZE = 1;
+	FlightModeFlag flightModes[FLIGHT_MODES_SIZE] = {FlightModeFlag::_3D};
 
+	PX4_INFO("1111111111111111111 %llu", vehicle_status.timestamp);
+	PX4_INFO("2222222222222222222 %u", static_cast<uint16_t>(vehicle_status.timestamp));
 	osd.setTime(static_cast<uint16_t>(vehicle_status.timestamp));
-	// osd.setArmed(vehicle_status.arming_state == vehicle_status_s::ARMING_STATE_ARMED);
-	// osd.setFlightMode(mode_util::nav_state_names[vehicle_status.nav_state], flightModes, FLIGHT_MODES_SIZE);
-	// osd.setBattery(battery_status.voltage_v * 10, battery_status.current_a * 100);
-	// osd.setAttitude(pitch, roll, yaw);
+	osd.setArmed(vehicle_status.arming_state == vehicle_status_s::ARMING_STATE_ARMED);
+	osd.setFlightMode(mode_util::nav_state_names[vehicle_status.nav_state], flightModes, FLIGHT_MODES_SIZE);
+	osd.setBattery(battery_status.voltage_v * 10, battery_status.current_a * 100);
+	osd.setAttitude(pitch, roll, yaw);
 
-	// osd.draw();
+	osd.draw();
 
 
 
@@ -605,7 +607,17 @@ $ canvas_osd
 
 extern "C" __EXPORT int canvas_osd_main(int argc, char *argv[])
 {
+	PX4_INFO("print===v3---");
 	return MspOsd::main(argc, argv);
+
+	// uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+	// 	vehicle_status_s vehicle_status{};
+	// 	_vehicle_status_sub.copy(&vehicle_status);
+
+	// PX4_INFO("1111111111111111111 %llu", vehicle_status.timestamp);
+	// // PX4_INFO("111111111111111111111111 %u", vehicle_status.timestamp);
+	// PX4_INFO("222222222222222222222222 %u", static_cast<uint16_t>(vehicle_status.timestamp));
+
 
 
 
