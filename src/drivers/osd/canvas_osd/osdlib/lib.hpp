@@ -28,20 +28,20 @@ public:
     void setBattery(float voltage, float current);
     void setAttitude(int pitch, int roll, int yaw);
     void setTime(uint16_t time);
-    // void print();
+    void print(int tag);
+    MspEncoder *encoder = nullptr;
 private:
-    OsdBlinker *blinker;
+    OsdBlinker *blinker = nullptr;
 
-    MspWriter *writer;
-    MspEncoder *encoder;
+    MspWriter *writer = nullptr;
 
-    OsdLayoutPainter *painter;
-    OsdLayout **layouts;
+    OsdLayoutPainter *painter = nullptr;
+    OsdLayout **layouts = nullptr;
     size_t layoutsSize = 0;
     int currentLayout = -1;
 
     FlightModeFlag *flightModes = nullptr;
     size_t flightModesSize = 0;
-    OsdParams *params;
+    OsdParams *params = nullptr;
     uint16_t time = 0;
 };

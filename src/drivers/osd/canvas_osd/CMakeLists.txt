@@ -22,7 +22,7 @@ set_target_properties(libstdc++ PROPERTIES IMPORTED_LOCATION ${LIBSTDCCXX_LOCATI
 px4_add_module(
 	MODULE drivers__osd__canvas_osd
 	MAIN canvas_osd
-	STACK_MAIN 9000
+	STACK_MAIN 160000
 	SRCS
 		msp_osd.cpp
 		MspV1.cpp

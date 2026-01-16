@@ -98,15 +98,18 @@ enum SymbolIndex : uint8_t {
 	POWER			= 21
 };
 
-class MspOsd : public ModuleBase<MspOsd>, public ModuleParams, public px4::ScheduledWorkItem
+class MspOsd : public ModuleBase<MspOsd>, public ModuleParams
 {
 public:
 	MspOsd(const char *device);
 
-	~MspOsd() override;
+	virtual ~MspOsd() = default;
 
 	/** @see ModuleBase */
 	static int task_spawn(int argc, char *argv[]);
+
+	/** @see ModuleBase */
+	static MspOsd *instantiate(int argc, char *argv[]);
 
 	/** @see ModuleBase */
 	static int custom_command(int argc, char *argv[]);
@@ -114,36 +117,33 @@ public:
 	/** @see ModuleBase */
 	static int print_usage(const char *reason = nullptr);
 
+	/** @see ModuleBase::run() */
+	void run() override;
+
 	bool init();
 
 	/** @see ModuleBase::print_status() */
 	int print_status() override;
 
 private:
-	void Run() override;
+	/**
+	 * @brief Closes the serial port.
+	 * @return Returns 0 if success or ERRNO.
+	 */
+	int close_serial();
 
-	// update a single display element in the display
-	// void Send(const unsigned int message_type, const void *payload);
-
-	// send full configuration to MSP (triggers the actual update)
-	// void SendConfig();
-	void SendTelemetry();
+	/**
+	 * @brief Opens the serial port.
+	 * @return Returns true if the open was successful or ERRNO.
+	 */
+	int open_serial();
 
 	// perform actions required for local updates
 	void parameters_update();
 
-	// convenience function to check if a given symbol is enabled
-	bool enabled(const SymbolIndex &symbol);
-
-	// MspV1 _msp{0};
-
-	Osd osd{0};
+	// Osd osd{0};
 
 	int _msp_fd{-1};
-
-	// msp_osd::MessageDisplay _display{};
-
-	bool _is_initialized{false};
 
 	// subscriptions to desired vehicle display information
 	uORB::Subscription _airspeed_validated_sub{ORB_ID(airspeed_validated)};

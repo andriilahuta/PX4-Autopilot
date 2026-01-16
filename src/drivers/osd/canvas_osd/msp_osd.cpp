@@ -70,6 +70,8 @@
 #include <lib/geo/geo.h>
 #include <lib/modes/ui.hpp>
 
+#include <px4_platform_common/events.h>
+
 //OSD elements positions
 //in betaflight configurator set OSD elements to your desired positions and in CLI type "set osd" to retreieve the numbers.
 //234 -> not visible. Horizontally 2048-2074(spacing 1), vertically 2048-2528(spacing 32). 26 characters X 15 lines
@@ -117,8 +119,7 @@ const uint16_t osd_current_draw_pos = 2103;
 const uint16_t osd_numerical_vario_pos = LOCATION_HIDDEN;
 
 MspOsd::MspOsd(const char *device) :
-	ModuleParams(nullptr),
-	ScheduledWorkItem(MODULE_NAME, px4::wq_configurations::lp_default)
+	ModuleParams(nullptr)
 {
 	// _display.set_period(_param_osd_scroll_rate.get() * 1000ULL);
 	// _display.set_dwell(_param_osd_dwell_time.get() * 1000ULL);
@@ -131,13 +132,15 @@ MspOsd::MspOsd(const char *device) :
 
 
 
-	// // for (int i = 0; i < 5; i++) {
-	// PX4_INFO("11111111111111111");
+	// for (int i = 0; i < 10; i++) {
+	// PX4_INFO("ctr===v3---%d", i + 1);
+	// PX4_INFO("------------ctr 11111111111111111");
 	// sleep(2);
-	// Osd osd(0);
-	// PX4_INFO("22222222222222222");
+	// // Osd osd2(0);
+	// // osd = osd2;
+	// PX4_INFO("------------ctr 22222222222222222");
 	// sleep(2);
-	// // osd = Osd(_msp_fd);
+	// osd = Osd(_msp_fd);
 	// // Osd osd(0);
 	// // PX4_INFO("33333333333333333");
 	// // sleep(2);
@@ -145,121 +148,71 @@ MspOsd::MspOsd(const char *device) :
 	// // PX4_INFO("44444444444444444");
 	// // sleep(2);
 	// osd.setBlinkerEnabled(true);
-	// PX4_INFO("33333333333333333");
+	// PX4_INFO("------------ctr 33333333333333333");
 	// sleep(2);
-	// osd.print();
-	// PX4_INFO("55555555555555555");
-	// sleep(2);
-	// // }
+	// // osd.print();
+	// // PX4_INFO("------------ctr 55555555555555555");
+	// // sleep(2);
+	// }
 }
 
-MspOsd::~MspOsd()
+int MspOsd::close_serial()
 {
-}
+	int ret = ::close(_msp_fd);
 
-bool MspOsd::init()
-{
-	ScheduleOnInterval(100_ms);
-
-	return true;
-}
-
-// void MspOsd::SendConfig()
-// {
-// 	msp_osd_config_t msp_osd_config;
-
-// 	msp_osd_config.units = 0;
-// 	msp_osd_config.osd_item_count = 56;
-// 	msp_osd_config.osd_stat_count = 24;
-// 	msp_osd_config.osd_timer_count = 2;
-// 	msp_osd_config.osd_warning_count = 16;              // 16
-// 	msp_osd_config.osd_profile_count = 1;              // 1
-// 	msp_osd_config.osdprofileindex = 1;                // 1
-// 	msp_osd_config.overlay_radio_mode = 0;             //  0
-
-// 	// display conditional elements
-// 	msp_osd_config.osd_craft_name_pos = enabled(SymbolIndex::CRAFT_NAME) ? osd_craft_name_pos : LOCATION_HIDDEN;
-// 	msp_osd_config.osd_disarmed_pos = enabled(SymbolIndex::DISARMED) ? osd_disarmed_pos : LOCATION_HIDDEN;
-// 	msp_osd_config.osd_gps_lat_pos = enabled(SymbolIndex::GPS_LAT) ? osd_gps_lat_pos : LOCATION_HIDDEN;
-// 	msp_osd_config.osd_gps_lon_pos = enabled(SymbolIndex::GPS_LON) ? osd_gps_lon_pos : LOCATION_HIDDEN;
-// 	msp_osd_config.osd_gps_sats_pos = enabled(SymbolIndex::GPS_SATS) ? osd_gps_sats_pos : LOCATION_HIDDEN;
-// 	msp_osd_config.osd_gps_speed_pos = enabled(SymbolIndex::GPS_SPEED) ? osd_gps_speed_pos : LOCATION_HIDDEN;
-// 	msp_osd_config.osd_home_dist_pos = enabled(SymbolIndex::HOME_DIST) ? osd_home_dist_pos : LOCATION_HIDDEN;
-// 	msp_osd_config.osd_home_dir_pos = enabled(SymbolIndex::HOME_DIR) ? osd_home_dir_pos : LOCATION_HIDDEN;
-// 	msp_osd_config.osd_main_batt_voltage_pos = enabled(SymbolIndex::MAIN_BATT_VOLTAGE) ? osd_main_batt_voltage_pos :
-// 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_current_draw_pos = enabled(SymbolIndex::CURRENT_DRAW) ? osd_current_draw_pos : LOCATION_HIDDEN;
-// 	msp_osd_config.osd_mah_drawn_pos = enabled(SymbolIndex::MAH_DRAWN) ? osd_mah_drawn_pos : LOCATION_HIDDEN;
-// 	msp_osd_config.osd_rssi_value_pos = enabled(SymbolIndex::RSSI_VALUE) ? osd_rssi_value_pos : LOCATION_HIDDEN;
-// 	msp_osd_config.osd_altitude_pos = enabled(SymbolIndex::ALTITUDE) ? osd_altitude_pos : LOCATION_HIDDEN;
-// 	msp_osd_config.osd_numerical_vario_pos = enabled(SymbolIndex::NUMERICAL_VARIO) ? osd_numerical_vario_pos :
-// 			LOCATION_HIDDEN;
-
-// 	msp_osd_config.osd_power_pos = enabled(SymbolIndex::POWER) ? osd_power_pos : LOCATION_HIDDEN;
-// 	msp_osd_config.osd_avg_cell_voltage_pos = enabled(SymbolIndex::AVG_CELL_VOLTAGE) ? osd_avg_cell_voltage_pos :
-// 			LOCATION_HIDDEN;
-
-// 	// the location of our crosshairs can change
-// 	msp_osd_config.osd_crosshairs_pos = LOCATION_HIDDEN;
-
-// 	if (enabled(SymbolIndex::CROSSHAIRS)) {
-// 		msp_osd_config.osd_crosshairs_pos = osd_crosshairs_pos - 32 * _param_osd_ch_height.get();
-// 	}
-
-// 	// possibly available, but not currently used
-// 	msp_osd_config.osd_flymode_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_esc_tmp_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_pitch_angle_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_roll_angle_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_horizon_sidebars_pos = 		LOCATION_HIDDEN;
-
-// 	// Not implemented or not available
-// 	msp_osd_config.osd_artificial_horizon_pos = 		LOCATION_HIDDEN;
-// 	msp_osd_config.osd_item_timer_1_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_item_timer_2_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_throttle_pos_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_vtx_channel_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_roll_pids_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_pitch_pids_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_yaw_pids_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_pidrate_profile_pos =		LOCATION_HIDDEN;
-// 	msp_osd_config.osd_warnings_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_debug_pos = 				LOCATION_HIDDEN;
-// 	msp_osd_config.osd_main_batt_usage_pos = 		LOCATION_HIDDEN;
-// 	msp_osd_config.osd_numerical_heading_pos = 		LOCATION_HIDDEN;
-// 	msp_osd_config.osd_compass_bar_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_esc_rpm_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_remaining_time_estimate_pos = 	LOCATION_HIDDEN;
-// 	msp_osd_config.osd_rtc_datetime_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_adjustment_range_pos = 		LOCATION_HIDDEN;
-// 	msp_osd_config.osd_core_temperature_pos = 		LOCATION_HIDDEN;
-// 	msp_osd_config.osd_anti_gravity_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_g_force_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_motor_diag_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_log_status_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_flip_arrow_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_link_quality_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_flight_dist_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_stick_overlay_left_pos = 		LOCATION_HIDDEN;
-// 	msp_osd_config.osd_stick_overlay_right_pos = 		LOCATION_HIDDEN;
-// 	msp_osd_config.osd_display_name_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_esc_rpm_freq_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_rate_profile_name_pos = 		LOCATION_HIDDEN;
-// 	msp_osd_config.osd_pid_profile_name_pos = 		LOCATION_HIDDEN;
-// 	msp_osd_config.osd_profile_name_pos = 			LOCATION_HIDDEN;
-// 	msp_osd_config.osd_rssi_dbm_value_pos = 		LOCATION_HIDDEN;
-// 	msp_osd_config.osd_rc_channels_pos = 			LOCATION_HIDDEN;
-
-// 	_msp.Send(MSP_OSD_CONFIG, &msp_osd_config);
-// }
-
-void MspOsd::Run()
-{
-	if (should_exit()) {
-		ScheduleClear();
-		exit_and_cleanup();
-		return;
+	if (ret != 0) {
+		PX4_WARN("Could not close serial port");
 	}
+
+	return ret;
+}
+
+int MspOsd::open_serial()
+{
+	struct termios uart_config;
+	_msp_fd = open(_device, O_RDWR | O_NONBLOCK);
+
+	if (_msp_fd < 0) {
+		PX4_WARN("Failed to open serial port");
+		return PX4_ERROR;
+	}
+
+	tcgetattr(_msp_fd, &uart_config);
+	cfsetspeed(&uart_config, B115200);
+	uart_config.c_cflag &= ~(CSTOPB | PARENB | CRTSCTS);
+	uart_config.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
+	uart_config.c_iflag &= ~(IGNBRK | BRKINT | ICRNL | INLCR | PARMRK | INPCK | ISTRIP | IXON);
+	uart_config.c_oflag = 0;
+	tcsetattr(_msp_fd, TCSANOW, &uart_config);
+
+	return _msp_fd;
+}
+
+void MspOsd::run()
+{
+PX4_INFO("-----------run 1111111111111111111");
+
+	open_serial();
+
+	Osd osd(_msp_fd);
+	osd.print(1);
+
+	osd.setBlinkerEnabled(true);
+	PX4_INFO("-----------run 22222222222222222222222");
+	osd.print(2);
+
+	while (!should_exit()) {
+		px4_usleep(10000);
+		osd.print(3);
+
+		osd.setBattery(1.0, 2.0);
+
+		osd.draw();
+	}
+
+	PX4_INFO("Exiting.");
+	close_serial();
+
 
 	// Check if parameters have changed
 	// if (_parameter_update_sub.updated()) {
@@ -270,36 +223,7 @@ void MspOsd::Run()
 	// 	parameters_update();
 	// }
 
-	// perform first time initialization, if needed
-	if (!_is_initialized) {
-		struct termios t;
-		_msp_fd = open(_device, O_RDWR | O_NONBLOCK);
-
-		if (_msp_fd < 0) {
-			// _performance_data.initialization_problems = true;
-			return;
-		}
-
-		tcgetattr(_msp_fd, &t);
-		cfsetspeed(&t, B115200);
-		t.c_cflag &= ~(CSTOPB | PARENB | CRTSCTS);
-		t.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
-		t.c_iflag &= ~(IGNBRK | BRKINT | ICRNL | INLCR | PARMRK | INPCK | ISTRIP | IXON);
-		t.c_oflag = 0;
-		tcsetattr(_msp_fd, TCSANOW, &t);
-
-	// 	// _msp = MspV1(_msp_fd);
-	// 	PX4_INFO("11111111111111111");
-	// 	// Osd osd{0};
-	// 	PX4_INFO("22222222222222222");
-		osd = Osd(_msp_fd);
-	// 	PX4_INFO("33333333333333333");
-		osd.setBlinkerEnabled(true);
-	// 	PX4_INFO("44444444444444444");
-
-		_is_initialized = true;
-	}
-
+PX4_INFO("-----------run 77777777777777777777777");
 	// avoid premature pessimization; if skip processing if we're effectively disabled
 	// if (_param_osd_symbols.get() == 0) {
 	// 	return;
@@ -435,33 +359,40 @@ void MspOsd::Run()
 
 
 
-		vehicle_status_s vehicle_status{};
-		_vehicle_status_sub.copy(&vehicle_status);
-
-		vehicle_attitude_s vehicle_attitude{};
-		_vehicle_attitude_sub.copy(&vehicle_attitude);
-
-		battery_status_s battery_status{};
-		_battery_status_sub.copy(&battery_status);
-
-	matrix::Eulerf euler_attitude(matrix::Quatf(vehicle_attitude.q));
-	const auto yaw = math::degrees(euler_attitude.psi());
-	const auto pitch = math::degrees(euler_attitude.theta());
-	const auto roll = math::degrees(euler_attitude.phi());
-
-	const size_t FLIGHT_MODES_SIZE = 1;
-	FlightModeFlag flightModes[FLIGHT_MODES_SIZE] = {FlightModeFlag::_3D};
-
-	PX4_INFO("1111111111111111111 %llu", vehicle_status.timestamp);
-	PX4_INFO("2222222222222222222 %u", static_cast<uint16_t>(vehicle_status.timestamp));
-	osd.setTime(static_cast<uint16_t>(vehicle_status.timestamp));
-	osd.setArmed(vehicle_status.arming_state == vehicle_status_s::ARMING_STATE_ARMED);
-	osd.setFlightMode(mode_util::nav_state_names[vehicle_status.nav_state], flightModes, FLIGHT_MODES_SIZE);
-	osd.setBattery(battery_status.voltage_v * 10, battery_status.current_a * 100);
-	osd.setAttitude(pitch, roll, yaw);
-
-	osd.draw();
-
+//		vehicle_status_s vehicle_status{};
+//		_vehicle_status_sub.copy(&vehicle_status);
+//
+//		vehicle_attitude_s vehicle_attitude{};
+//		_vehicle_attitude_sub.copy(&vehicle_attitude);
+//
+//		battery_status_s battery_status{};
+//		_battery_status_sub.copy(&battery_status);
+//
+//	matrix::Eulerf euler_attitude(matrix::Quatf(vehicle_attitude.q));
+//	const auto yaw = math::degrees(euler_attitude.psi());
+//	const auto pitch = math::degrees(euler_attitude.theta());
+//	const auto roll = math::degrees(euler_attitude.phi());
+//
+//	const size_t FLIGHT_MODES_SIZE = 1;
+//	FlightModeFlag flightModes[FLIGHT_MODES_SIZE] = {FlightModeFlag::_3D};
+//PX4_INFO("-----------3333333333333333");
+//	osd.setTime(static_cast<uint16_t>(vehicle_status.timestamp));
+//	osd.setArmed(vehicle_status.arming_state == vehicle_status_s::ARMING_STATE_ARMED);
+//	osd.setFlightMode(mode_util::nav_state_names[vehicle_status.nav_state], flightModes, FLIGHT_MODES_SIZE);
+//	osd.setBattery(battery_status.voltage_v * 10, battery_status.current_a * 100);
+//	osd.setAttitude(pitch, roll, yaw);
+//
+//	osd.draw();
+//
+//
+//	PX4_INFO("main-------TIME---%llu===", vehicle_status.timestamp);
+//	// PX4_INFO("2222222222222222222 %u", static_cast<uint16_t>(vehicle_status.timestamp));
+//
+//	events::send<uint64_t>(
+//		events::ID("canvas_osd"), events::Log::Error,
+//		"main-------TIME---{1}===",
+//		vehicle_status.timestamp
+//	);
 
 
 
@@ -481,16 +412,6 @@ void MspOsd::Run()
         // painter.draw(layout);
 }
 
-// void MspOsd::Send(const unsigned int message_type, const void *payload)
-// {
-// 	if (_msp.Send(message_type, payload)) {
-// 		_performance_data.successful_sends++;
-
-// 	} else {
-// 		_performance_data.unsuccessful_sends++;
-// 	}
-// }
-
 void MspOsd::parameters_update()
 {
 	// update our display rate and dwell time
@@ -498,12 +419,24 @@ void MspOsd::parameters_update()
 	// _display.set_dwell(hrt_abstime(_param_osd_dwell_time.get() * 1000ULL));
 }
 
-bool MspOsd::enabled(const SymbolIndex &symbol)
+int MspOsd::task_spawn(int argc, char *argv[])
 {
-	return _param_osd_symbols.get() & (1u << symbol);
+	_task_id = px4_task_spawn_cmd("MspOsd",
+				      SCHED_DEFAULT,
+				      SCHED_PRIORITY_MAX,
+				      160000,
+				      (px4_main_t)&run_trampoline,
+				      (char *const *)argv);
+
+	if (_task_id < 0) {
+		_task_id = -1;
+		return -errno;
+	}
+
+	return 0;
 }
 
-int MspOsd::task_spawn(int argc, char *argv[])
+MspOsd *MspOsd::instantiate(int argc, char *argv[])
 {
 	// initialize device
 	const char *device = nullptr;
@@ -528,39 +461,26 @@ int MspOsd::task_spawn(int argc, char *argv[])
 	}
 
 	if (error_flag) {
-		return PX4_ERROR;
+		return nullptr;
 	}
 
 	if (!device) {
 		PX4_ERR("Missing device");
-		return PX4_ERROR;
+		return nullptr;
 	}
 
 	MspOsd *instance = new MspOsd(device);
 
-	if (instance) {
-		_object.store(instance);
-		_task_id = task_id_is_work_queue;
-
-		if (instance->init()) {
-			return PX4_OK;
-		}
-
-	} else {
+	if (instance == nullptr) {
 		PX4_ERR("alloc failed");
 	}
 
-	delete instance;
-	_object.store(nullptr);
-	_task_id = -1;
-
-	return PX4_ERROR;
+	return instance;
 }
 
 int MspOsd::print_status()
 {
 	PX4_INFO("Running on %s", _device);
-	PX4_INFO("\tinitialized: %d", _is_initialized);
 	// PX4_INFO("\tinitialization issues: %d", _performance_data.initialization_problems);
 	// PX4_INFO("\tscroll rate: %d", static_cast<int>(_param_osd_scroll_rate.get()));
 	// PX4_INFO("\tsuccessful sends: %lu", _performance_data.successful_sends);
@@ -576,7 +496,7 @@ int MspOsd::print_status()
 
 int MspOsd::custom_command(int argc, char *argv[])
 {
-	return 0;
+	return print_usage("Unrecognized command.");
 }
 
 int MspOsd::print_usage(const char *reason)
@@ -607,7 +527,7 @@ $ canvas_osd
 
 extern "C" __EXPORT int canvas_osd_main(int argc, char *argv[])
 {
-	PX4_INFO("print===v3---");
+	PX4_INFO("print===v1---");
 	return MspOsd::main(argc, argv);
 
 	// uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
@@ -619,32 +539,51 @@ extern "C" __EXPORT int canvas_osd_main(int argc, char *argv[])
 	// PX4_INFO("222222222222222222222222 %u", static_cast<uint16_t>(vehicle_status.timestamp));
 
 
+	// 	struct termios t;
+	// 	int _msp_fd = open("/dev/ttyS0", O_RDWR | O_NONBLOCK);
+
+	// 	if (_msp_fd < 0) {
+	// 		// _performance_data.initialization_problems = true;
+	// 		PX4_INFO("0000000000000");
+	// 		return 1;
+	// 	}
+
+	// 	tcgetattr(_msp_fd, &t);
+	// 	cfsetspeed(&t, B115200);
+	// 	t.c_cflag &= ~(CSTOPB | PARENB | CRTSCTS);
+	// 	t.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
+	// 	t.c_iflag &= ~(IGNBRK | BRKINT | ICRNL | INLCR | PARMRK | INPCK | ISTRIP | IXON);
+	// 	t.c_oflag = 0;
+	// 	tcsetattr(_msp_fd, TCSANOW, &t);
+
+	// 	Osd osd(_msp_fd);
 
 
 	// for (int i = 0; i < 100; i++) {
 	// 	PX4_INFO("print===v2---%d", i + 1);
-	// 	sleep(2);
-	// // }
+	// 	// sleep(1);
 
-	// PX4_INFO("11111111111111111");
-	// sleep(2);
-	// Osd osd(0);
-	// PX4_INFO("22222222222222222");
-	// sleep(2);
-	// // osd = Osd(_msp_fd);
-	// // Osd osd(0);
-	// // PX4_INFO("33333333333333333");
-	// // sleep(2);
-	// // osd.print();
-	// // PX4_INFO("44444444444444444");
-	// // sleep(2);
-	// osd.setBlinkerEnabled(true);
-	// // PX4_INFO("33333333333333333");
-	// sleep(2);
-	// osd.setBattery(1.0, 2.0);
-	// PX4_INFO("55555555555555555");
-	// sleep(2);
+	// 	PX4_INFO("11111111111111111");
+	// 	// sleep(1);
+
+	// 	// Osd osd(0);
+	// 	// PX4_INFO("22222222222222222");
+	// 	// sleep(1);
+
+	// 	osd.setBlinkerEnabled(true);
+	// 	PX4_INFO("33333333333333333");
+	// 	sleep(1);
+
+	// 	osd.setBattery(1.0, 2.0);
+	// 	PX4_INFO("55555555555555555");
+	// 	sleep(1);
+
+	// 	osd.draw();
+	// 	PX4_INFO("66666666666666666");
+	// 	// sleep(1);
 	// }
 
-	// return 0;
+	// PX4_INFO("777777777777777 end");
+
+	return 0;
 }
