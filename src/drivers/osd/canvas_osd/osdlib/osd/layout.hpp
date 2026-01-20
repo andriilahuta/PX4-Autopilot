@@ -23,6 +23,8 @@ struct OsdPrimaryLayoutConfig {
 struct OsdBatteryParams {
     float voltage = 0;
     float current = 0;
+    int percentage = 100;
+    bool isCritical = false;
 };
 
 struct OsdAttitudeParams {

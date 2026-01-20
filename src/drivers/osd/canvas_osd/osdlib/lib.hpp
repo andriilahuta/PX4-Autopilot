@@ -25,10 +25,10 @@ public:
 
     void setArmed(bool armed);
     void setFlightMode(const char* name, const FlightModeFlag modes[], size_t modesSize);
-    void setBattery(float voltage, float current);
+    void setBattery(float voltage, float current, int percentage = 100, bool isCritical = false);
     void setAttitude(int pitch, int roll, int yaw);
     void setTime(uint16_t time);
-    void print(int tag);
+
     MspEncoder *encoder = nullptr;
 private:
     OsdBlinker *blinker = nullptr;

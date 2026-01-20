@@ -1,6 +1,6 @@
 #include <algorithm>
 #include "objects.hpp"
-#include "../../utils.hpp"
+#include "../utils.hpp"
 #include "../../../compatlib/format.hpp"
 
 
@@ -32,16 +32,31 @@ OsdBattery::OsdBattery() {
     update(0, 0);
 }
 
+void OsdBattery::setPercentage(int value) {
+    percentage = std::clamp(value, 0, 100);
+}
+
+void OsdBattery::setCritical(bool value) {
+    isCritical = value;
+}
+
 void OsdBattery::update(float voltage, float current) {
-    const bool isCritical = true;
+    int battSymbolIndex = (percentage * 7) / 101;  // divide by 101 to avoid overflow at 100
+    OsdSymbol battSymbol;
+    if (battSymbolIndex >= 0 && battSymbolIndex < 7) {
+        battSymbol = batterySymbols[battSymbolIndex];
+    } else {
+        battSymbol = OsdSymbol::BATT_EMPTY;
+    }
+
     value = std::format(
-        "{:c} {}{:c}",
-        static_cast<unsigned char>(OsdSymbol::BATT_3),
+        "{:c} {:04.1f}{:c}",
+        static_cast<unsigned char>(battSymbol),
         voltage, static_cast<unsigned char>(OsdSymbol::VOLT)
     );
     if (config->showAmps) {
         value += std::format(
-            " {}{:c}",
+            " {:04.1f}{:c}",
             current, static_cast<unsigned char>(OsdSymbol::AMP)
         );
     }
@@ -58,12 +73,14 @@ OsdHorizon::OsdHorizon() {
 }
 
 void OsdHorizon::update(int pitch, int roll) {
-    const int sign = inverted ? -1 : 1;
-    const int maxPitch = this->maxPitch * 10;
-    const int maxRoll = this->maxRoll * 10;
+    const int pitchSign = config->invertedPitch ? -1 : 1;
+    const int rollSign = config->invertedRoll ? -1 : 1;
 
-    roll = std::clamp(roll * sign, -maxRoll, maxRoll);
-    pitch = std::clamp(pitch * sign, -maxPitch, maxPitch);
+    const int maxPitch = this->maxPitch;
+    const int maxRoll = this->maxRoll;
+
+    pitch = std::clamp(pitch * pitchSign, -maxPitch, maxPitch);
+    roll = std::clamp(roll * rollSign, -maxRoll, maxRoll);
 
     // Convert pitch to y compensation value
     // uses fixed divisor of 8 and fixed max AHI pitch angle of 20.0 degrees
@@ -80,7 +97,7 @@ const std::vector<OsdElement> OsdHorizon::elements() const {
     std::vector<OsdElement> res;
 
     for (int x = -4; x <= 4; x++) {
-        int y = -roll * x / 64 - pitch;
+        int y = -roll * x / 8 - pitch;
         if (y >= 0 && y <= 81) {
             res.push_back(
                 OsdElement {
@@ -143,21 +160,6 @@ OsdCompass::OsdCompass() {
 }
 
 void OsdCompass::update(int yaw) {
-    const int degYaw = msp_osd_utils::decidegrees_to_degrees(yaw);
-    const int direction = getDiscreteDirection(degYaw, 16);
+    const int direction = calculations::convertHeadingToDiscreteDirection(yaw, 16);
     value = std::string(compassBar.begin() + direction, compassBar.begin() + direction + 9);
-}
-
-int OsdCompass::getDiscreteDirection(int heading, int directions) {
-    const int circle = 360;
-    heading += circle;  // Ensure positive value
-
-    // Split input heading 0..359 into sectors 0..(directions - 1), but offset
-    // by half a sector so that sector 0 gets centered around heading 0.
-    // We multiply heading by directions to not loose precision in divisions
-    // In this way each segment will be a `circle` length
-    int direction = (heading * directions + circle / 2) / circle;  // scale with rounding
-    direction %= directions;  // normalize
-
-    return direction;  // return segment number
 }

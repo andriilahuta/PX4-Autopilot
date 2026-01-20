@@ -35,9 +35,6 @@ namespace msp_osd_utils {
     }
 
 
-    int decidegrees_to_degrees(int angle);
-
-
     class SyncTimer {
     public:
         SyncTimer();

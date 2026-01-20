@@ -46,8 +46,11 @@ void OsdPrimaryLayout::updateObjects(const OsdParams& params) {
 
     compass->update(params.attitude.yaw);
     horizon->update(params.attitude.pitch, params.attitude.roll);
-    batteryInfo->update(params.battery.voltage, params.battery.current);
     flightMode->setValue(params.flightMode);
+
+    batteryInfo->setPercentage(params.battery.percentage);
+    batteryInfo->setCritical(params.battery.isCritical);
+    batteryInfo->update(params.battery.voltage, params.battery.current);
 
     armingStatus->setValue(params.armed ? "ARMED" : "DISARMED");
     if (params.armed && !prevParams.armed) {

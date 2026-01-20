@@ -1,7 +1,4 @@
-// #include <iostream>
-
 #include "lib.hpp"
-
 #include "msp.hpp"
 #include "osd/layout.hpp"
 #include "osd/utils.hpp"
@@ -19,9 +16,9 @@ Osd::Osd(int fd) {
     layouts[0] = new OsdPrimaryLayout(OsdPrimaryLayoutConfig {
 		.elements = {
 		    {OsdLayoutElement::COMPASS, {12, 0}, nullptr},
-		    {OsdLayoutElement::HORIZON, {23, 8}, std::make_shared<OsdHorizonConfig>(true)},
+		    {OsdLayoutElement::HORIZON, {23, 8}, std::make_shared<OsdHorizonConfig>()},
 		    {OsdLayoutElement::CROSSHAIRS, {20, 8}, nullptr},
-		    {OsdLayoutElement::BATTERY_INFO, {0, 0}, std::make_shared<OsdBatteryConfig>(false)},
+		    {OsdLayoutElement::BATTERY_INFO, {0, 2}, std::make_shared<OsdBatteryConfig>()},
 		    {OsdLayoutElement::ARMING_STATUS, {14, 15}, nullptr},
 		}
 	});
@@ -61,9 +58,6 @@ void Osd::draw() {
 
 void Osd::setBlinkerEnabled(bool enabled) {
     blinker->enabled = enabled;
-
-    OsdText t;
-    blinker->showObject(t);
 }
 
 bool Osd::setCurrentLayout(size_t num) {
@@ -80,6 +74,7 @@ void Osd::setFlightMode(const char* name, const FlightModeFlag modes[], size_t m
     params->flightMode = name;
 
     if (flightModes != nullptr) delete[] flightModes;
+
     flightModes = new FlightModeFlag[modesSize];
     for (size_t i = 0; i < modesSize; i++) {
         flightModes[i] = modes[i];
@@ -87,8 +82,8 @@ void Osd::setFlightMode(const char* name, const FlightModeFlag modes[], size_t m
     flightModesSize = modesSize;
 }
 
-void Osd::setBattery(float voltage, float current) {
-    params->battery = OsdBatteryParams{voltage, current};
+void Osd::setBattery(float voltage, float current, int percentage, bool isCritical) {
+    params->battery = OsdBatteryParams{voltage, current, percentage, isCritical};
 }
 
 void Osd::setAttitude(int pitch, int roll, int yaw) {
@@ -98,7 +93,3 @@ void Osd::setAttitude(int pitch, int roll, int yaw) {
 void Osd::setTime(uint16_t time) {
     this->time = time;
 }
-
-// void Osd::print() {
-//     std::cout << "foo" << std::endl;
-// }

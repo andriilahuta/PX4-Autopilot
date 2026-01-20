@@ -17,3 +17,20 @@ bool OsdBlinker::showObject(const OsdObject& object) const {
 
     return now.count() % (period * 2) < period;
 }
+
+
+namespace calculations {
+    int convertHeadingToDiscreteDirection(int heading, int directions) {
+        const int circle = 360;
+        heading += circle;  // Ensure positive value
+
+        // Split input heading 0..359 into sectors 0..(directions - 1), but offset
+        // by half a sector so that sector 0 gets centered around heading 0.
+        // We multiply heading by directions to not loose precision in divisions
+        // In this way each segment will be a `circle` length
+        int direction = (heading * directions + circle / 2) / circle;  // scale with rounding
+        direction %= directions;  // normalize
+
+        return direction;  // return segment number
+    }
+}

@@ -16,3 +16,8 @@ public:
 private:
     OsdBlinker() {};
 };
+
+
+namespace calculations {
+    int convertHeadingToDiscreteDirection(int heading, int directions);
+}
